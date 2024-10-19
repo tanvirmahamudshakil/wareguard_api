@@ -12,11 +12,10 @@ const app = express();
 
 
 
-app.get("/header", async (req, res) => {
-
+app.get("/wireguard", async (req, res) => {
     await ServerConfiger()
     await ClientConfigure()
-    serverDown()
+    ServerRun()
     res.status(200).send({ "message": "successfull" });
 });
 
