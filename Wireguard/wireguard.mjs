@@ -123,7 +123,7 @@ function journalctl() {
         console.log(`WireGuard Service Logs:\n${stdout}`);
     });
 
-    exec('sudo ufw allow 22 && sudo ufw enable -y', (error, stdout, stderr) => {
+    exec('sudo ufw allow 22 && sudo ufw enable', (error, stdout, stderr) => {
         if (error) {
             console.error(`Error: ${error.message}`);
             return;
@@ -132,6 +132,7 @@ function journalctl() {
             console.error(`Standard Error: ${stderr}`);
             return;
         }
+        exec("y")
         console.log(`WireGuard Service Logs:\n${stdout}`);
     });
 
@@ -159,7 +160,7 @@ function journalctl() {
         console.log(`WireGuard Service Logs:\n${stdout}`);
     });
 
-    exec("echo 'net.ipv4.ip_forward = 1' | sudo tee -a /etc/sysctl.conf", (error, stdout, stderr) => {
+    exec("echo net.ipv4.ip_forward = 1 | sudo tee -a /etc/sysctl.conf", (error, stdout, stderr) => {
         if (error) {
             console.error(`Error: ${error.message}`);
             return;

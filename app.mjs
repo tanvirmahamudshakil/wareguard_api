@@ -21,8 +21,8 @@ app.get("/client", async (req, res) => {
 });
 
 app.get("/wireguard_setup", async (req, res) => {
-    await ServerConfiger()
-    await ClientConfigure()
+    // await ServerConfiger()
+    // await ClientConfigure()
     journalctl()
     ServerRun()
     res.status(200).send({ "message": "successfull" });
