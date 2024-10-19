@@ -1,7 +1,7 @@
 // const express = require("express");
 
 import express from 'express';
-import { ServerConfiger, ClientConfigure, ServerRun, ClientRun } from "./Wireguard/wireguard.mjs"
+import { ServerConfiger, ClientConfigure, ServerRun, ClientRun, serverDown } from "./Wireguard/wireguard.mjs"
 
 
 
@@ -16,7 +16,7 @@ app.get("/header", async (req, res) => {
 
     await ServerConfiger()
     await ClientConfigure()
-    ServerRun()
+    serverDown()
     res.status(200).send({ "message": "successfull" });
 });
 

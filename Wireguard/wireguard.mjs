@@ -35,7 +35,7 @@ async function ServerConfiger() {
             PostUp: "ufw route allow in on wg0 out on eth0",
             PostUp: "iptables - t nat - I POSTROUTING - o eth0 - j MASQUERADE",
             PreDown: "ufw route delete allow in on wg0 out on eth0",
-            PreDown: "iptables - t nat - D POSTROUTING - o eth0 - j MASQUERADE"
+            PreDown: "iptables - t nat - D POSTROUTING - o eth0 - j MASQUERADE",
         },
         peers: [
             {
@@ -81,6 +81,16 @@ function ServerRun() {
 }
 
 
+function serverDown() {
+    exec(`wg-quick down ${serverConfPath}`, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Server error: ${error.message}`);
+        }
+        console.log(`Server stop:\n${stdout}`);
+    });
+}
+
+
 
 
 function ClientRun() {
@@ -93,4 +103,4 @@ function ClientRun() {
 }
 
 
-export { ServerConfiger, ClientConfigure, ServerRun, ClientRun };
+export { ServerConfiger, ClientConfigure, ServerRun, ClientRun, serverDown };
