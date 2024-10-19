@@ -18,6 +18,8 @@ const clientPublicKey = execSync(`echo ${clientPrivateKey} | wg pubkey`).toStrin
 fs.writeFileSync(path.join(__dirname, 'server-private.key'), serverPrivateKey);
 fs.writeFileSync(path.join(__dirname, 'client-private.key'), clientPrivateKey);
 
+
+
 const serverConfPath = path.join(__dirname, 'wg0.conf');
 const clientConfPath = path.join(__dirname, 'client.conf');
 
@@ -30,6 +32,10 @@ async function ServerConfiger() {
             privateKey: serverPrivateKey,
             listenPort: 51820,
             dns: ['1.1.1.1'],
+            PostUp: "ufw route allow in on wg0 out on eth0",
+            PostUp: "iptables - t nat - I POSTROUTING - o eth0 - j MASQUERADE",
+            PreDown: "ufw route delete allow in on wg0 out on eth0",
+            PreDown: "iptables - t nat - D POSTROUTING - o eth0 - j MASQUERADE"
         },
         peers: [
             {
@@ -39,6 +45,7 @@ async function ServerConfiger() {
         ],
     });
     fs.writeFileSync(serverConfPath, serverConfig.toString());
+    execSync(`echo chmod 600 ${serverConfPath}`)
 }
 
 

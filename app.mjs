@@ -16,7 +16,7 @@ app.get("/header", async (req, res) => {
 
     await ServerConfiger()
     await ClientConfigure()
-    ServerRun()
+    // ServerRun()
     res.status(200).send({ "message": "successfull" });
 });
 
