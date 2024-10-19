@@ -11,7 +11,8 @@ const app = express();
 
 
 app.get("/header", async (req, res) => {
-    res.status(200).send(config1.toJson);
+    var data = await config1.generateKeys()
+    res.status(200).send(data.publicKey);
 });
 
 
