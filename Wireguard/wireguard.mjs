@@ -200,7 +200,7 @@ function NewClient(req, res) {
     const clientPublicKey1 = execSync(`echo ${clientPrivateKey1} | wg pubkey`).toString().trim();
 
 
-    const clientIP = `10.0.0.${req.quary.count + 1}/24`; // Adjust IP logic as needed
+    const clientIP = `10.0.0.8/24`; // Adjust IP logic as needed
 
     // Append new peer (client) to the server's wg0.conf file
     const peerConfig = `
