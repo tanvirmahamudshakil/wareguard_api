@@ -191,24 +191,24 @@ function ClientRun() {
 
 
 function NewClient(req, res) {
-    try {
-        const clientPrivateKey1 = execSync('wg genkey').toString().trim();
-        const clientPublicKey1 = execSync(`echo ${clientPrivateKey1} | wg pubkey`).toString().trim();
+
+    const clientPrivateKey1 = execSync('wg genkey').toString().trim();
+    const clientPublicKey1 = execSync(`echo ${clientPrivateKey1} | wg pubkey`).toString().trim();
 
 
-        const clientIP = `10.0.0.${getNewClientIP()}/24`; // Adjust IP logic as needed
+    const clientIP = `10.0.0.${getNewClientIP()}/24`; // Adjust IP logic as needed
 
-        // Append new peer (client) to the server's wg0.conf file
-        const peerConfig = `
+    // Append new peer (client) to the server's wg0.conf file
+    const peerConfig = `
 [Peer]
 PublicKey = ${clientPublicKey1}
 AllowedIPs = "10.0.5.5/24"
 `;
-        fs.appendFileSync(serverConfPath, peerConfig);
+    fs.appendFileSync(serverConfPath, peerConfig);
 
-        // Generate client configuration file (client.conf)
-        const serverPublicKey = getServerPublicKey(); // Retrieve the server's public key
-        const clientConf = `
+    // Generate client configuration file (client.conf)
+    const serverPublicKey = getServerPublicKey(); // Retrieve the server's public key
+    const clientConf = `
 [Interface]
 PrivateKey = ${clientPrivateKey1}
 Address = ${clientIP}
@@ -222,21 +222,18 @@ PersistentKeepalive = 25
 `;
 
 
-        const clientConfPath = path.join(wireguardDir, `client-${getNewClientIP()}.conf`);
-        fs.writeFileSync(clientConfPath, clientConf);
+    const clientConfPath = path.join(wireguardDir, `client-${getNewClientIP()}.conf`);
+    fs.writeFileSync(clientConfPath, clientConf);
 
-        exec('sudo systemctl restart wg-quick@wg0.service', (error, stdout, stderr) => {
-            if (error) {
-                console.error(`Error restarting WireGuard service: ${error.message}`);
-                return res.status(500).json({ error: 'Failed to restart WireGuard service' });
-            }
+    exec('sudo systemctl restart wg-quick@wg0.service', (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error restarting WireGuard service: ${error.message}`);
+            return res.status(500).json({ error: 'Failed to restart WireGuard service' });
+        }
 
-            res.send(clientConf);
-        });
-    } catch (error) {
-        console.error(`Error creating client: ${err.message}`);
-        res.status(500).json({ error: 'Failed to create client' });
-    }
+        res.send(clientConf);
+    });
+
 }
 
 
