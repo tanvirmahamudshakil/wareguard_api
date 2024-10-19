@@ -67,6 +67,8 @@ AllowedIPs = 10.8.0.2/32
 
     fs.writeFileSync(serverConfPath, wg0Conf);
     execSync(`echo chmod 600 ${serverConfPath}`)
+
+    return fs.readFileSync(`${serverConfPath}wg0.conf`, 'utf8')
 }
 
 
@@ -102,12 +104,101 @@ AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 15
 `;
 
-    fs.writeFileSync(path.join(wireguardDir, 'client.conf'), clientConf);
+    fs.writeFileSync(clientConfPath, clientConf);
+    return fs.readFileSync(`${clientConfPath}client.conf`, 'utf8')
 }
 
 
 
+function journalctl() {
+    exec('sudo journalctl -u wg-quick@wg0.service', (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.error(`Standard Error: ${stderr}`);
+            return;
+        }
+        console.log(`WireGuard Service Logs:\n${stdout}`);
+    });
+
+    exec('sudo ufw allow 22 && sudo ufw enable -y', (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.error(`Standard Error: ${stderr}`);
+            return;
+        }
+        console.log(`WireGuard Service Logs:\n${stdout}`);
+    });
+
+    exec('sudo ufw allow 51820/udp', (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.error(`Standard Error: ${stderr}`);
+            return;
+        }
+        console.log(`WireGuard Service Logs:\n${stdout}`);
+    });
+
+    exec('sudo ufw reload', (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.error(`Standard Error: ${stderr}`);
+            return;
+        }
+        console.log(`WireGuard Service Logs:\n${stdout}`);
+    });
+
+    exec("echo 'net.ipv4.ip_forward = 1' | sudo tee -a /etc/sysctl.conf", (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.error(`Standard Error: ${stderr}`);
+            return;
+        }
+        console.log(`WireGuard Service Logs:\n${stdout}`);
+    });
+
+    exec("sudo iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -o eth0 -j MASQUERADE", (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.error(`Standard Error: ${stderr}`);
+            return;
+        }
+        console.log(`WireGuard Service Logs:\n${stdout}`);
+    });
+
+    exec("sudo iptables-save | sudo tee /etc/iptables/rules.v4", (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.error(`Standard Error: ${stderr}`);
+            return;
+        }
+        console.log(`WireGuard Service Logs:\n${stdout}`);
+    });
+}
+
+
 function ServerRun() {
+
     exec('sudo systemctl start wg-quick@wg0.service', (error, stdout, stderr) => {
         if (error) {
             console.error(`Error starting WireGuard service: ${error.message}`);
@@ -153,4 +244,4 @@ function ClientRun() {
 }
 
 
-export { ServerConfiger, ClientConfigure, ServerRun, ClientRun, serverDown };
+export { ServerConfiger, ClientConfigure, ServerRun, ClientRun, serverDown, journalctl };
