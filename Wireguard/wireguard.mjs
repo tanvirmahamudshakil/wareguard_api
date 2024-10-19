@@ -200,7 +200,7 @@ function NewClient(req, res) {
     const clientPublicKey1 = execSync(`echo ${clientPrivateKey1} | wg pubkey`).toString().trim();
 
 
-    const clientIP = `10.0.0.${(useIpList.length + 1)}/24`; // Adjust IP logic as needed
+    const clientIP = `10.0.0.${req.quary.count + 1}/24`; // Adjust IP logic as needed
 
     // Append new peer (client) to the server's wg0.conf file
     const peerConfig = `
@@ -208,28 +208,34 @@ function NewClient(req, res) {
 PublicKey = ${clientPublicKey1}
 AllowedIPs = ${clientIP}
 `;
-    fs.appendFileSync(serverConfPath, peerConfig);
+    try {
+        fs.appendFileSync(serverConfPath, peerConfig);
+        var d = fs.readFileSync(serverConfPath, "utf8")
+        res.send(d);
+    } catch (error) {
+        res.send(error);
+    }
 
     // Generate client configuration file (client.conf)
-    const serverPublicKey = getServerPublicKey(); // Retrieve the server's public key
-    const clientConf = `
-[Interface]
-PrivateKey = ${clientPrivateKey1}
-Address = ${clientIP}
-DNS = 1.1.1.1
+    //     const serverPublicKey = getServerPublicKey(); // Retrieve the server's public key
+    //     const clientConf = `
+    // [Interface]
+    // PrivateKey = ${clientPrivateKey1}
+    // Address = ${clientIP}
+    // DNS = 1.1.1.1
 
-[Peer]
-PublicKey = ${serverPublicKey}
-Endpoint = 143.110.176.147:51820
-AllowedIPs = 0.0.0.0/0
-PersistentKeepalive = 25
-`;
+    // [Peer]
+    // PublicKey = ${serverPublicKey}
+    // Endpoint = 143.110.176.147:51820
+    // AllowedIPs = 0.0.0.0/0
+    // PersistentKeepalive = 25
+    // `;
 
 
-    const clientConfPath = path.join(wireguardDir, `client-${useIpList.length + 1}.conf`);
-    fs.writeFileSync(clientConfPath, clientConf);
-    console.log(useIpList)
-    res.send(clientConf);
+    //     const clientConfPath = path.join(wireguardDir, `client-${useIpList.length + 1}.conf`);
+    //     fs.writeFileSync(clientConfPath, clientConf);
+    //     console.log(useIpList)
+    //     res.send(clientConf);
 
     // exec('sudo systemctl restart wg-quick@wg0.service', (error, stdout, stderr) => {
     //     if (error) {
