@@ -243,7 +243,7 @@ PersistentKeepalive = 25
 function getNewClientIP() {
     // Read the current server configuration to determine the next IP address
     const wgConf = fs.readFileSync(serverConfPath, 'utf-8');
-    const usedIPs = wgConf.match(/10\.8\.0\.\d{1,3}\/24/g) || [];
+    const usedIPs = wgConf.match(/10\.8\.0\.\d{1,144}\/24/g) || [];
     const usedLastOctets = usedIPs.map(ip => parseInt(ip.split('.')[3]));
     const maxIP = Math.max(...usedLastOctets, 1); // Start at .2 to avoid conflicts with server IP
     return maxIP + 1;
