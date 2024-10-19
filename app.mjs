@@ -16,11 +16,13 @@ app.get("/header", async (req, res) => {
 
     var data = await config1.generateKeys()
     config1.wgInterface.name = 'tanvir'
-    var config = await config1.writeToFile()
+    config1.wgInterface.dns = ['1.1.1.1']
+    config1.writeToFile()
 
-    // bring up
-    await config1.up()
-    res.status(200).send(config);
+    // but make sure you restart the interface for your changes to take effect
+    await config1.restart()
+
+    res.status(200).send(config1.toJson());
 });
 
 

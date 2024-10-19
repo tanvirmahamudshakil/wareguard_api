@@ -1,5 +1,5 @@
 import path from 'path'
-import { WgConfig } from "wireguard-tools"
+import { WgConfig, createPeerPairs } from "wireguard-tools"
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { execSync } from 'child_process';
@@ -35,7 +35,19 @@ const config1 = new WgConfig({
 });
 
 
-
+createPeerPairs({
+    config: config1,
+    peerSettings: ({ thisConfig, peerConfig }) => {
+        const peerAddress = peerConfig.wgInterface.address
+        const peerPresharedKey = peerConfig.preSharedKey
+        return {
+            allowedIps: peerAddress,
+            preSharedKey: peerPresharedKey,
+            name: peerConfig.wgInterface.name,
+            persistentKeepalive: thisConfig.wgInterface.address.includes('10.10.1.1') ? 25 : undefined
+        }
+    }
+})
 
 
 export { config1 };
