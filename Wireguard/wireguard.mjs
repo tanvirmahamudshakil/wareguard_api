@@ -11,43 +11,78 @@ const __dirname = dirname(__filename);
 
 const serverPrivateKey = execSync('wg genkey').toString().trim();
 const serverPublicKey = execSync(`echo ${serverPrivateKey} | wg pubkey`).toString().trim();
+const clientPrivateKey = execSync('wg genkey').toString().trim();
+const clientPublicKey = execSync(`echo ${clientPrivateKey} | wg pubkey`).toString().trim();
 
-// Generate private and public keys for the peer
-const peerPrivateKey = execSync('wg genkey').toString().trim();
-const peerPublicKey = execSync(`echo ${peerPrivateKey} | wg pubkey`).toString().trim();
+// Save keys
+fs.writeFileSync(path.join(__dirname, 'server-private.key'), serverPrivateKey);
+fs.writeFileSync(path.join(__dirname, 'client-private.key'), clientPrivateKey);
 
 
-const filePath = path.join(__dirname, '/configs', '/tanvir.conf')
 
-const config1 = new WgConfig({
-    wgInterface: {
-        address: ['10.0.0.1/24'], // Define the address for the WireGuard interface
-        privateKey: serverPrivateKey,
-        listenPort: 51820, // Default WireGuard port
-    },
-    peers: [
-        {
-            publicKey: peerPublicKey,
-            allowedIps: ['10.0.0.2/32'], // Allowed IP ranges for this peer
+// Server configuration
+async function ServerConfiger()  {
+    const serverConfPath = path.join(__dirname, 'wg0.conf');
+    const serverConfig = new WgConfig({
+        wgInterface: {
+            address: ['10.0.0.1/24'],
+            privateKey: serverPrivateKey,
+            listenPort: 51820,
+            dns: ['1.1.1.1'],
         },
-    ],
-    filePath: filePath
-});
+        peers: [
+            {
+                publicKey: clientPublicKey,
+                allowedIps: ['10.0.0.2/32'],
+            },
+        ],
+    });
+    fs.writeFileSync(serverConfPath, serverConfig.toString());
+}
 
 
-createPeerPairs({
-    config: config1,
-    peerSettings: ({ thisConfig, peerConfig }) => {
-        const peerAddress = peerConfig.wgInterface.address
-        const peerPresharedKey = peerConfig.preSharedKey
-        return {
-            allowedIps: peerAddress,
-            preSharedKey: peerPresharedKey,
-            name: peerConfig.wgInterface.name,
-            persistentKeepalive: thisConfig.wgInterface.address.includes('10.10.1.1') ? 25 : undefined
+// Client configuration
+async function ClientConfigure() {
+    const clientConfPath = path.join(__dirname, 'client.conf');
+    const clientConfig = new WgConfig({
+        wgInterface: {
+            address: ['10.0.0.2/24'],
+            privateKey: clientPrivateKey,
+            dns: ['1.1.1.1'],
+        },
+        peers: [
+            {
+                publicKey: serverPublicKey,
+                allowedIps: ['0.0.0.0/0'],
+                endpoint: 'your-server-ip:51820',
+            },
+        ],
+    });
+    fs.writeFileSync(clientConfPath, clientConfig.toString());
+}
+
+
+
+function ServerRun() {
+    exec(`wg-quick up ${serverConfPath}`, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Server error: ${error.message}`);
         }
-    }
-})
+        console.log(`Server started:\n${stdout}`);
+    });
+}
 
 
-export { config1 };
+
+
+function ClientRun() {
+    exec(`wg-quick up ${clientConfPath}`, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Client error: ${error.message}`);
+        }
+        console.log(`Client started:\n${stdout}`);
+    });
+}
+
+
+export { ServerConfiger, ClientConfigure, ServerRun, ClientRun };
