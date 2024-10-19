@@ -30,26 +30,6 @@ const clientConfPath = path.join(wireguardDir, 'client.conf');
 
 // Server configuration
 async function ServerConfiger() {
-
-    // const serverConfig = new WgConfig({
-    //     wgInterface: {
-    //         address: ['10.0.0.1/24'],
-    //         privateKey: serverPrivateKey,
-    //         listenPort: 51820,
-    //         dns: ['1.1.1.1'],
-    //         PostUp: "ufw route allow in on wg0 out on eth0",
-    //         PostUp: "iptables - t nat - I POSTROUTING - o eth0 - j MASQUERADE",
-    //         PreDown: "ufw route delete allow in on wg0 out on eth0",
-    //         PreDown: "iptables - t nat - D POSTROUTING - o eth0 - j MASQUERADE",
-    //     },
-    //     peers: [
-    //         {
-    //             publicKey: clientPublicKey,
-    //             allowedIps: ['10.0.0.2/32'],
-    //         },
-    //     ],
-    // });
-    // fs.writeFileSync(serverConfPath, serverConfig.toString());
     const wg0Conf = `
 [Interface]
 Address = 10.8.0.1/24
@@ -66,7 +46,7 @@ AllowedIPs = 10.8.0.2/32
 `;
 
     fs.writeFileSync(serverConfPath, wg0Conf);
-    execSync(`echo chmod 600 ${serverConfPath}`)
+    execSync(`sudo chmod 600 ${serverConfPath}`)
 
     return fs.readFileSync(`${serverConfPath}`, 'utf8')
 }
@@ -74,23 +54,6 @@ AllowedIPs = 10.8.0.2/32
 
 // Client configuration
 async function ClientConfigure() {
-
-    // const clientConfig = new WgConfig({
-    //     wgInterface: {
-    //         address: ['10.0.0.2/24'],
-    //         privateKey: clientPrivateKey,
-    //         dns: ['1.1.1.1'],
-    //     },
-    //     peers: [
-    //         {
-    //             publicKey: serverPublicKey,
-    //             allowedIps: ['0.0.0.0/0'],
-    //             endpoint: '143.110.176.147:51820',
-    //         },
-    //     ],
-    // });
-    // fs.writeFileSync(clientConfPath, clientConfig.toString());
-
     const clientConf = `
 [Interface]
 Address = 10.8.0.2/24
@@ -103,7 +66,6 @@ Endpoint = 143.110.176.147:51820
 AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 15
 `;
-
     fs.writeFileSync(clientConfPath, clientConf);
     return fs.readFileSync(`${clientConfPath}`, 'utf8')
 }
@@ -123,18 +85,18 @@ function journalctl() {
         console.log(`WireGuard Service Logs:\n${stdout}`);
     });
 
-    exec('sudo ufw allow 22 && sudo ufw enable', (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Error: ${error.message}`);
-            return;
-        }
-        if (stderr) {
-            console.error(`Standard Error: ${stderr}`);
-            return;
-        }
-        exec("y")
-        console.log(`WireGuard Service Logs:\n${stdout}`);
-    });
+    // exec('sudo ufw allow 22 && sudo ufw enable', (error, stdout, stderr) => {
+    //     if (error) {
+    //         console.error(`Error: ${error.message}`);
+    //         return;
+    //     }
+    //     if (stderr) {
+    //         console.error(`Standard Error: ${stderr}`);
+    //         return;
+    //     }
+    //     exec("y")
+    //     console.log(`WireGuard Service Logs:\n${stdout}`);
+    // });
 
     exec('sudo ufw allow 51820/udp', (error, stdout, stderr) => {
         if (error) {
