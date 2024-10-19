@@ -228,7 +228,7 @@ PersistentKeepalive = 25
 
     const clientConfPath = path.join(wireguardDir, `client-${useIpList.length + 1}.conf`);
     fs.writeFileSync(clientConfPath, clientConf);
-
+    console.log(useIpList)
     res.send(clientConf);
 
     // exec('sudo systemctl restart wg-quick@wg0.service', (error, stdout, stderr) => {
