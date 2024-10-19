@@ -190,7 +190,7 @@ function ClientRun() {
 
 
 
-function NewClient() {
+function NewClient(req, res) {
     try {
         const clientPrivateKey1 = execSync('wg genkey').toString().trim();
         const clientPublicKey1 = execSync(`echo ${clientPrivateKey1} | wg pubkey`).toString().trim();

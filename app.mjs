@@ -36,9 +36,9 @@ app.get("/run", async (req, res) => {
 app.get("/new_client", async (req, res) => {
     // await ServerConfiger()
     // await ClientConfigure()
-    NewClient()
+    NewClient(req, res)
 
-    res.status(200).send({ "message": "successfull" });
+    // res.status(200).send({ "message": "successfull" });
 });
 
 
