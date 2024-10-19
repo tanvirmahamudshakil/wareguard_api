@@ -2,7 +2,6 @@ import path from 'path'
 import { WgConfig, createPeerPairs } from "wireguard-tools"
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import { execSync } from 'child_process';
 import fs from 'fs';
 import { execSync, exec } from 'child_process';
 
