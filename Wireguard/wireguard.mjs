@@ -18,11 +18,12 @@ const clientPublicKey = execSync(`echo ${clientPrivateKey} | wg pubkey`).toStrin
 fs.writeFileSync(path.join(__dirname, 'server-private.key'), serverPrivateKey);
 fs.writeFileSync(path.join(__dirname, 'client-private.key'), clientPrivateKey);
 
-
+const serverConfPath = path.join(__dirname, 'wg0.conf');
+const clientConfPath = path.join(__dirname, 'client.conf');
 
 // Server configuration
 async function ServerConfiger() {
-    const serverConfPath = path.join(__dirname, 'wg0.conf');
+
     const serverConfig = new WgConfig({
         wgInterface: {
             address: ['10.0.0.1/24'],
@@ -43,7 +44,7 @@ async function ServerConfiger() {
 
 // Client configuration
 async function ClientConfigure() {
-    const clientConfPath = path.join(__dirname, 'client.conf');
+
     const clientConfig = new WgConfig({
         wgInterface: {
             address: ['10.0.0.2/24'],
