@@ -85,19 +85,6 @@ function journalctl() {
         console.log(`WireGuard Service Logs:\n${stdout}`);
     });
 
-    // exec('sudo ufw allow 22 && sudo ufw enable', (error, stdout, stderr) => {
-    //     if (error) {
-    //         console.error(`Error: ${error.message}`);
-    //         return;
-    //     }
-    //     if (stderr) {
-    //         console.error(`Standard Error: ${stderr}`);
-    //         return;
-    //     }
-    //     exec("y")
-    //     console.log(`WireGuard Service Logs:\n${stdout}`);
-    // });
-
     exec('sudo ufw allow 51820/udp', (error, stdout, stderr) => {
         if (error) {
             console.error(`Error: ${error.message}`);
@@ -161,7 +148,6 @@ function journalctl() {
 
 
 function ServerRun() {
-
     exec('sudo systemctl start wg-quick@wg0.service', (error, stdout, stderr) => {
         if (error) {
             console.error(`Error starting WireGuard service: ${error.message}`);
@@ -184,17 +170,13 @@ function serverDown() {
             console.error(`Error stoping WireGuard service: ${error.message}`);
             return;
         }
-
         if (stderr) {
             console.error(`WireGuard service stderr: ${stderr}`);
             return;
         }
-
         console.log(`WireGuard service stop successfully: ${stdout}`);
     });
 }
-
-
 
 
 function ClientRun() {
@@ -207,4 +189,75 @@ function ClientRun() {
 }
 
 
-export { ServerConfiger, ClientConfigure, ServerRun, ClientRun, serverDown, journalctl };
+
+function NewClient() {
+    try {
+        const clientPrivateKey1 = execSync('wg genkey').toString().trim();
+        const clientPublicKey1 = execSync(`echo ${clientPrivateKey1} | wg pubkey`).toString().trim();
+
+
+        const clientIP = `10.0.0.${getNewClientIP()}/24`; // Adjust IP logic as needed
+
+        // Append new peer (client) to the server's wg0.conf file
+        const peerConfig = `
+[Peer]
+PublicKey = ${clientPublicKey1}
+AllowedIPs = ${clientIP}
+`;
+        fs.appendFileSync(serverConfPath, peerConfig);
+
+        // Generate client configuration file (client.conf)
+        const serverPublicKey = getServerPublicKey(); // Retrieve the server's public key
+        const clientConf = `
+[Interface]
+PrivateKey = ${clientPrivateKey1}
+Address = ${clientIP}
+DNS = 1.1.1.1
+
+[Peer]
+PublicKey = ${serverPublicKey}
+Endpoint = 143.110.176.147:51820
+AllowedIPs = 0.0.0.0/0
+PersistentKeepalive = 25
+`;
+
+
+        const clientConfPath = path.join(wireguardDir, `client-${getNewClientIP()}.conf`);
+        fs.writeFileSync(clientConfPath, clientConf);
+
+        exec('sudo systemctl restart wg-quick@wg0.service', (error, stdout, stderr) => {
+            if (error) {
+                console.error(`Error restarting WireGuard service: ${error.message}`);
+                return res.status(500).json({ error: 'Failed to restart WireGuard service' });
+            }
+
+            res.json({
+                message: 'Client created successfully',
+                clientConfig: clientConf, // Return the configuration so client can download it
+            });
+        });
+    } catch (error) {
+        console.error(`Error creating client: ${err.message}`);
+        res.status(500).json({ error: 'Failed to create client' });
+    }
+}
+
+
+function getNewClientIP() {
+    // Read the current server configuration to determine the next IP address
+    const wgConf = fs.readFileSync(serverConfPath, 'utf-8');
+    const usedIPs = wgConf.match(/10\.8\.0\.\d{1,3}\/24/g) || [];
+    const usedLastOctets = usedIPs.map(ip => parseInt(ip.split('.')[3]));
+    const maxIP = Math.max(...usedLastOctets, 1); // Start at .2 to avoid conflicts with server IP
+    return maxIP + 1;
+}
+
+// Function to get the server's public key
+function getServerPublicKey() {
+    const serverPrivateKey = fs.readFileSync(path.join(wireguardDir, 'server-private.key'), 'utf-8').trim();
+    return execSync(`echo ${serverPrivateKey} | wg pubkey`).toString().trim();
+}
+
+
+
+export { ServerConfiger, ClientConfigure, ServerRun, ClientRun, serverDown, journalctl, NewClient };

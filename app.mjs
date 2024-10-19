@@ -1,7 +1,7 @@
 // const express = require("express");
 
 import express from 'express';
-import { ServerConfiger, ClientConfigure, ServerRun, ClientRun, serverDown, journalctl } from "./Wireguard/wireguard.mjs"
+import { ServerConfiger, ClientConfigure, ServerRun, ClientRun, serverDown, journalctl, NewClient } from "./Wireguard/wireguard.mjs"
 
 
 
@@ -21,16 +21,22 @@ app.get("/client", async (req, res) => {
 });
 
 app.get("/wireguard_setup", async (req, res) => {
-    // await ServerConfiger()
-    // await ClientConfigure()
     journalctl()
-
     res.status(200).send({ "message": "successfull" });
 });
 app.get("/run", async (req, res) => {
     // await ServerConfiger()
     // await ClientConfigure()
     ServerRun()
+
+    res.status(200).send({ "message": "successfull" });
+});
+
+
+app.get("/new_client", async (req, res) => {
+    // await ServerConfiger()
+    // await ClientConfigure()
+    NewClient()
 
     res.status(200).send({ "message": "successfull" });
 });
