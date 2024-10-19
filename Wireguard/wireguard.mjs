@@ -23,6 +23,7 @@ fs.writeFileSync(path.join(wireguardDir, 'client-private.key'), clientPrivateKey
 fs.writeFileSync(path.join(wireguardDir, 'client-public.key'), clientPublicKey);
 
 
+var useIpList = []
 
 
 const serverConfPath = path.join(wireguardDir, 'wg0.conf');
@@ -44,7 +45,8 @@ ListenPort = 51820
 PublicKey = ${clientPublicKey}
 AllowedIPs = 10.8.0.2/32
 `;
-
+    const result = useIpList.find(({ name }) => name === "10.8.0.1");
+    if (!result) useIpList.push("10.8.0.1")
     fs.writeFileSync(serverConfPath, wg0Conf);
     execSync(`sudo chmod 600 ${serverConfPath}`)
 
@@ -66,6 +68,8 @@ Endpoint = 143.110.176.147:51820
 AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 15
 `;
+    const result = useIpList.find(({ name }) => name === "10.8.0.2");
+    if (!result) useIpList.push("10.8.0.2")
     fs.writeFileSync(clientConfPath, clientConf);
     return fs.readFileSync(`${clientConfPath}`, 'utf8')
 }
@@ -196,13 +200,13 @@ function NewClient(req, res) {
     const clientPublicKey1 = execSync(`echo ${clientPrivateKey1} | wg pubkey`).toString().trim();
 
 
-    const clientIP = `10.0.0.${getNewClientIP()}/24`; // Adjust IP logic as needed
+    const clientIP = `10.0.0.${(result.length + 1)}/24`; // Adjust IP logic as needed
 
     // Append new peer (client) to the server's wg0.conf file
     const peerConfig = `
 [Peer]
 PublicKey = ${clientPublicKey1}
-AllowedIPs = "10.0.5.5/24"
+AllowedIPs = ${clientIP}
 `;
     fs.appendFileSync(serverConfPath, peerConfig);
 
@@ -222,7 +226,7 @@ PersistentKeepalive = 25
 `;
 
 
-    const clientConfPath = path.join(wireguardDir, `client-${getNewClientIP()}.conf`);
+    const clientConfPath = path.join(wireguardDir, `client-${result.length + 1}.conf`);
     fs.writeFileSync(clientConfPath, clientConf);
 
     // exec('sudo systemctl restart wg-quick@wg0.service', (error, stdout, stderr) => {
