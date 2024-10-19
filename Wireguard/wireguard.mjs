@@ -202,7 +202,7 @@ function NewClient(req, res) {
         const peerConfig = `
 [Peer]
 PublicKey = ${clientPublicKey1}
-AllowedIPs = ${clientIP}
+AllowedIPs = "10.0.5.5/24"
 `;
         fs.appendFileSync(serverConfPath, peerConfig);
 
