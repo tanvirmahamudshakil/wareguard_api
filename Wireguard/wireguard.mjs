@@ -22,7 +22,7 @@ fs.writeFileSync(path.join(__dirname, 'client-private.key'), clientPrivateKey);
 
 
 // Server configuration
-async function ServerConfiger()  {
+async function ServerConfiger() {
     const serverConfPath = path.join(__dirname, 'wg0.conf');
     const serverConfig = new WgConfig({
         wgInterface: {
@@ -55,7 +55,7 @@ async function ClientConfigure() {
             {
                 publicKey: serverPublicKey,
                 allowedIps: ['0.0.0.0/0'],
-                endpoint: 'your-server-ip:51820',
+                endpoint: '143.110.176.147:51820',
             },
         ],
     });
