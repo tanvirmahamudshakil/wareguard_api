@@ -51,15 +51,19 @@ async function ServerConfiger() {
     // });
     // fs.writeFileSync(serverConfPath, serverConfig.toString());
     const wg0Conf = `
-          [Interface]
-          Address = 10.0.0.1/24
-          PrivateKey = ${serverPrivateKey}
-          ListenPort = 51820
+[Interface]
+Address = 10.8.0.1/24
+PrivateKey = ${serverPrivateKey}
+PostUp = ufw route allow in on wg0 out on eth0
+PostUp = iptables -t nat -I POSTROUTING -o eth0 -j MASQUERADE
+PreDown = ufw route delete allow in on wg0 out on eth0
+PreDown = iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+ListenPort = 51820
 
-          [Peer]
-          PublicKey = ${clientPublicKey}
-          AllowedIPs = 10.0.0.2/32
-          `;
+[Peer]
+PublicKey = ${clientPublicKey}
+AllowedIPs = 10.8.0.2/32
+`;
 
     fs.writeFileSync(serverConfPath, wg0Conf);
     execSync(`echo chmod 600 ${serverConfPath}`)
@@ -87,14 +91,15 @@ async function ClientConfigure() {
 
     const clientConf = `
 [Interface]
-Address = 10.0.0.2/24
+Address = 10.8.0.2/24
 PrivateKey = ${clientPrivateKey}
 DNS = 1.1.1.1
 
 [Peer]
 PublicKey = ${serverPublicKey}
-Endpoint = your-server-ip:51820
+Endpoint = 143.110.176.147:51820
 AllowedIPs = 0.0.0.0/0
+PersistentKeepalive = 15
 `;
 
     fs.writeFileSync(path.join(wireguardDir, 'client.conf'), clientConf);
