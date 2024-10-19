@@ -68,7 +68,7 @@ AllowedIPs = 10.8.0.2/32
     fs.writeFileSync(serverConfPath, wg0Conf);
     execSync(`echo chmod 600 ${serverConfPath}`)
 
-    return fs.readFileSync(`${serverConfPath}wg0.conf`, 'utf8')
+    return fs.readFileSync(`${serverConfPath}`, 'utf8')
 }
 
 
@@ -105,7 +105,7 @@ PersistentKeepalive = 15
 `;
 
     fs.writeFileSync(clientConfPath, clientConf);
-    return fs.readFileSync(`${clientConfPath}client.conf`, 'utf8')
+    return fs.readFileSync(`${clientConfPath}`, 'utf8')
 }
 
 
