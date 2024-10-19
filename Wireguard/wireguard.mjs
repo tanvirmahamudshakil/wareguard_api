@@ -200,7 +200,7 @@ function NewClient(req, res) {
     const clientPublicKey1 = execSync(`echo ${clientPrivateKey1} | wg pubkey`).toString().trim();
 
 
-    const clientIP = `10.0.0.${(result.length + 1)}/24`; // Adjust IP logic as needed
+    const clientIP = `10.0.0.${(useIpList.length + 1)}/24`; // Adjust IP logic as needed
 
     // Append new peer (client) to the server's wg0.conf file
     const peerConfig = `
@@ -226,7 +226,7 @@ PersistentKeepalive = 25
 `;
 
 
-    const clientConfPath = path.join(wireguardDir, `client-${result.length + 1}.conf`);
+    const clientConfPath = path.join(wireguardDir, `client-${useIpList.length + 1}.conf`);
     fs.writeFileSync(clientConfPath, clientConf);
 
     // exec('sudo systemctl restart wg-quick@wg0.service', (error, stdout, stderr) => {
