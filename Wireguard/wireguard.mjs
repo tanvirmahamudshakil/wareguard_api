@@ -45,8 +45,8 @@ ListenPort = 51820
 PublicKey = ${clientPublicKey}
 AllowedIPs = 10.8.0.2/32
 `;
-    const result = useIpList.find(({ name }) => name === "10.8.0.1");
-    if (!result) useIpList.push("10.8.0.1")
+
+    useIpList.push("10.8.0.1")
     fs.writeFileSync(serverConfPath, wg0Conf);
     execSync(`sudo chmod 600 ${serverConfPath}`)
 
@@ -68,8 +68,8 @@ Endpoint = 143.110.176.147:51820
 AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 15
 `;
-    const result = useIpList.find(({ name }) => name === "10.8.0.2");
-    if (!result) useIpList.push("10.8.0.2")
+
+    useIpList.push("10.8.0.2")
     fs.writeFileSync(clientConfPath, clientConf);
     return fs.readFileSync(`${clientConfPath}`, 'utf8')
 }
