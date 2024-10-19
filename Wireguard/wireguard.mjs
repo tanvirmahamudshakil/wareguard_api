@@ -231,10 +231,7 @@ PersistentKeepalive = 25
                 return res.status(500).json({ error: 'Failed to restart WireGuard service' });
             }
 
-            res.json({
-                message: 'Client created successfully',
-                clientConfig: clientConf, // Return the configuration so client can download it
-            });
+            res.send(clientConf);
         });
     } catch (error) {
         console.error(`Error creating client: ${err.message}`);
