@@ -289,6 +289,6 @@ function getServerPublicKey() {
 
 
 export {
-    NewServerCreate, ServerRun, ClientRun, serverDown, journalctl, NewClientCreatel, serverConf,
+    NewServerCreate, ServerRun, ClientRun, serverDown, journalctl, NewClientCreate, serverConf,
     clientConf
 };
