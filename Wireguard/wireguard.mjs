@@ -393,7 +393,7 @@ function parseWireGuardOutput(output) {
                 lastPeer.inactive = true; // Mark as inactive
             }
         }
-        if (handshakeMatch == null && allowedIpsMatch && peerMatch && currentInterface) {
+        if (allowedIpsMatch && peerMatch && currentInterface) {
 
             const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
             console.log(`can not find ${handshakeMatch} ---${lastPeer.allowedIps}`)
@@ -409,7 +409,7 @@ function parseWireGuardOutput(output) {
     // Filter only inactive peers
     const inactivePeers = {};
     for (let iface in interfaces) {
-        inactivePeers[iface] = interfaces[iface].peers.filter(peer => peer.inactive == true && (peer.latestHandshake != null || peer.latestHandshake == null));
+        inactivePeers[iface] = interfaces[iface].peers.filter(peer => peer.inactive == true);
     }
 
     return inactivePeers;
