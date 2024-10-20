@@ -367,11 +367,13 @@ function parseWireGuardOutput(output) {
         }
 
 
+        const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
+        console.log(lastPeer)
         // Check for latest handshake
         const handshakeMatch = line.match(/latest handshake: (.+)/);
 
         if (handshakeMatch && currentInterface) {
-            const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
+
             const latestHandshake = parseHandshakeTime(handshakeMatch[1]);
 
             if (lastPeer && latestHandshake && latestHandshake < thirtyMinutesAgo) {
@@ -383,7 +385,7 @@ function parseWireGuardOutput(output) {
         }
     });
 
-    console.log(JSON.parse(interfaces))
+
     // Filter only inactive peers
     const inactivePeers = {};
     for (let iface in interfaces) {
