@@ -383,7 +383,7 @@ function parseWireGuardOutput(output) {
         }
     });
 
-    console.log(interfaces)
+    console.log(JSON.parse(interfaces))
     // Filter only inactive peers
     const inactivePeers = {};
     for (let iface in interfaces) {
