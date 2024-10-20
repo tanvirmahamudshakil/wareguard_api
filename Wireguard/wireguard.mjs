@@ -11,14 +11,26 @@ const wireguardDir = '/etc/wireguard/';
 // const __dirname = dirname(__filename);
 
 
-const serverPrivateKey = execSync('wg genkey').toString().trim();
-const serverPublicKey = execSync(`echo ${serverPrivateKey} | wg pubkey`).toString().trim();
-// const clientPrivateKey = execSync('wg genkey').toString().trim();
-// const clientPublicKey = execSync(`echo ${clientPrivateKey} | wg pubkey`).toString().trim();
+async function generateServerKey() {
+    const serverPrivateKey = execSync('wg genkey').toString().trim();
+    const serverPublicKey = execSync(`echo ${serverPrivateKey} | wg pubkey`).toString().trim();
+    // const clientPrivateKey = execSync('wg genkey').toString().trim();
+    // const clientPublicKey = execSync(`echo ${clientPrivateKey} | wg pubkey`).toString().trim();
 
-// Save keys
-fs.writeFileSync(path.join(wireguardDir, 'server-private.key'), serverPrivateKey);
-fs.writeFileSync(path.join(wireguardDir, 'server-public.key'), serverPublicKey);
+    // Save keys
+    fs.writeFileSync(path.join(wireguardDir, 'server-private.key'), serverPrivateKey);
+    fs.writeFileSync(path.join(wireguardDir, 'server-public.key'), serverPublicKey);
+}
+
+
+// const serverPrivateKey = execSync('wg genkey').toString().trim();
+// const serverPublicKey = execSync(`echo ${serverPrivateKey} | wg pubkey`).toString().trim();
+// // const clientPrivateKey = execSync('wg genkey').toString().trim();
+// // const clientPublicKey = execSync(`echo ${clientPrivateKey} | wg pubkey`).toString().trim();
+
+// // Save keys
+// fs.writeFileSync(path.join(wireguardDir, 'server-private.key'), serverPrivateKey);
+// fs.writeFileSync(path.join(wireguardDir, 'server-public.key'), serverPublicKey);
 // fs.writeFileSync(path.join(wireguardDir, 'client-private.key'), clientPrivateKey);
 // fs.writeFileSync(path.join(wireguardDir, 'client-public.key'), clientPublicKey);
 
@@ -31,6 +43,9 @@ const clientConfPath = path.join(wireguardDir, 'client.conf');
 
 // Server configuration
 async function NewServerCreate() {
+    generateServerKey()
+    const serverPrivateKey = fs.readFileSync(path.join(wireguardDir, 'server-private.key'), "utf-8")
+    
     const wg0Conf = `
 [Interface]
 Address = 10.8.0.1/32
@@ -192,6 +207,7 @@ function NewClientCreate(req, res) {
     const clientPublicKey1 = execSync(`echo ${clientPrivateKey1} | wg pubkey`).toString().trim();
     const clientConfPath = path.join(wireguardDir, `client-${req.query.userid}.conf`);
     const clientExit = fs.existsSync(clientConfPath)
+    const serverPublicKey = fs.readFileSync(path.join(wireguardDir, 'server-public.key'), "utf-8")
     const host = req.get('host');
     if (clientExit) {
         const clientconf = fs.readFileSync(clientConfPath, 'utf8')
@@ -210,11 +226,8 @@ AllowedIPs = ${clientIP}
 
         fs.appendFileSync(serverConfPath, peerConfig);
 
-
-
-
         //   Generate client configuration file (client.conf)
-        const serverPublicKey = getServerPublicKey(); // Retrieve the server's public key
+        
         const clientConf = `
 [Interface]
 PrivateKey = ${clientPrivateKey1}
