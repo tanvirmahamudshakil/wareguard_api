@@ -388,11 +388,11 @@ function parseWireGuardOutput(output) {
             }
         }
 
-        // If there's no handshake at all, mark peer as inactive
-        if (!handshakeMatch && lastPeer) {
-            lastPeer.latestHandshake = "Never connected";
-            lastPeer.inactive = true; // Mark as inactive if there's no handshake found
-        }
+        // // If there's no handshake at all, mark peer as inactive
+        // if (!handshakeMatch && lastPeer) {
+        //     lastPeer.latestHandshake = "Never connected";
+        //     lastPeer.inactive = true; // Mark as inactive if there's no handshake found
+        // }
 
 
     });
