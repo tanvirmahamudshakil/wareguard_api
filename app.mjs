@@ -13,8 +13,8 @@ const app = express();
 
 
 app.get("/get-ip", async (req, res) => {
-    const clientIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-    res.status(200).send(clientIp);
+    const host = req.get('host');
+    res.status(200).send(host);
 });
 
 
