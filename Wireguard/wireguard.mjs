@@ -326,6 +326,7 @@ function getWireGuardPeers(req, res) {
 function parseWireGuardOutput(output) {
     const interfaces = {};
     const lines = output.split('\n');
+    const thirtyMinutesAgo = Date.now() - 30 * 60 * 1000; // 30 minutes in milliseconds
     let currentInterface = null;
 
     lines.forEach(line => {
@@ -342,38 +343,46 @@ function parseWireGuardOutput(output) {
             interfaces[currentInterface].peers.push({ publicKey: peerMatch[1] });
         }
 
-        // Check for allowed IPs
-        const allowedIpsMatch = line.match(/allowed ips: (.+)/);
-        if (allowedIpsMatch && currentInterface) {
-            const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
-            if (lastPeer) {
-                lastPeer.allowedIps = allowedIpsMatch[1];
-            }
-        }
-
         // Check for latest handshake
         const handshakeMatch = line.match(/latest handshake: (.+)/);
         if (handshakeMatch && currentInterface) {
             const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
-            if (lastPeer) {
-                lastPeer.latestHandshake = handshakeMatch[1];
-            }
-        }
+            const latestHandshake = parseHandshakeTime(handshakeMatch[1]);
 
-        // Check for transfer data (sent/received)
-        const transferMatch = line.match(/transfer: (.+) received, (.+) sent/);
-        if (transferMatch && currentInterface) {
-            const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
-            if (lastPeer) {
-                lastPeer.received = transferMatch[1];
-                lastPeer.sent = transferMatch[2];
+            if (lastPeer && latestHandshake && latestHandshake < thirtyMinutesAgo) {
+                lastPeer.latestHandshake = handshakeMatch[1];
+                lastPeer.inactive = true; // Mark as inactive
             }
         }
     });
 
-    return interfaces;
+    // Filter only inactive peers
+    const inactivePeers = {};
+    for (let iface in interfaces) {
+        inactivePeers[iface] = interfaces[iface].peers.filter(peer => peer.inactive);
+    }
+
+    return inactivePeers;
 }
 
+// Function to parse handshake time from 'wg show' output
+function parseHandshakeTime(handshakeStr) {
+    const now = Date.now();
+
+    if (handshakeStr.includes('minute')) {
+        const minutesAgo = parseInt(handshakeStr.match(/(\d+) minute/)[1], 10);
+        return now - minutesAgo * 60 * 1000; // Convert to milliseconds
+    }
+
+    if (handshakeStr.includes('hour')) {
+        const hoursAgo = parseInt(handshakeStr.match(/(\d+) hour/)[1], 10);
+        return now - hoursAgo * 60 * 60 * 1000; // Convert to milliseconds
+    }
+
+    // Handle more cases (e.g., days ago, seconds ago) if needed
+
+    return null;
+}
 
 
 export {
