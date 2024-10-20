@@ -45,7 +45,7 @@ const clientConfPath = path.join(wireguardDir, 'client.conf');
 async function NewServerCreate() {
     generateServerKey()
     const serverPrivateKey = fs.readFileSync(path.join(wireguardDir, 'server-private.key'), "utf-8")
-    
+
     const wg0Conf = `
 [Interface]
 Address = 10.8.0.1/32
@@ -227,7 +227,7 @@ AllowedIPs = ${clientIP}
         fs.appendFileSync(serverConfPath, peerConfig);
 
         //   Generate client configuration file (client.conf)
-        
+
         const clientConf = `
 [Interface]
 PrivateKey = ${clientPrivateKey1}
@@ -300,14 +300,83 @@ const extractAllowedIPs = (configFile) => {
 // });
 
 // Function to get the server's public key
-function getServerPublicKey() {
-    const serverPrivateKey = fs.readFileSync(path.join(wireguardDir, 'server-private.key'), 'utf-8').trim();
-    return execSync(`echo ${serverPrivateKey} | wg pubkey`).toString().trim();
+
+
+
+function getWireGuardPeers(req, res) {
+    exec('wg show', (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error executing wg show: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.error(`Error: ${stderr}`);
+            return;
+        }
+
+        // Parse the output
+        const output = stdout;
+        const interfaces = parseWireGuardOutput(output);
+        console.log(interfaces);
+        req.json(interfaces)
+    });
+}
+
+// Function to parse the output of wg show
+function parseWireGuardOutput(output) {
+    const interfaces = {};
+    const lines = output.split('\n');
+    let currentInterface = null;
+
+    lines.forEach(line => {
+        // Check if it's an interface
+        const interfaceMatch = line.match(/^interface: (\S+)/);
+        if (interfaceMatch) {
+            currentInterface = interfaceMatch[1];
+            interfaces[currentInterface] = { peers: [] };
+        }
+
+        // Check for peer
+        const peerMatch = line.match(/^peer: (\S+)/);
+        if (peerMatch && currentInterface) {
+            interfaces[currentInterface].peers.push({ publicKey: peerMatch[1] });
+        }
+
+        // Check for allowed IPs
+        const allowedIpsMatch = line.match(/allowed ips: (.+)/);
+        if (allowedIpsMatch && currentInterface) {
+            const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
+            if (lastPeer) {
+                lastPeer.allowedIps = allowedIpsMatch[1];
+            }
+        }
+
+        // Check for latest handshake
+        const handshakeMatch = line.match(/latest handshake: (.+)/);
+        if (handshakeMatch && currentInterface) {
+            const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
+            if (lastPeer) {
+                lastPeer.latestHandshake = handshakeMatch[1];
+            }
+        }
+
+        // Check for transfer data (sent/received)
+        const transferMatch = line.match(/transfer: (.+) received, (.+) sent/);
+        if (transferMatch && currentInterface) {
+            const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
+            if (lastPeer) {
+                lastPeer.received = transferMatch[1];
+                lastPeer.sent = transferMatch[2];
+            }
+        }
+    });
+
+    return interfaces;
 }
 
 
 
 export {
     NewServerCreate, ServerRun, ClientRun, serverDown, journalctl, NewClientCreate, serverConf,
-    clientConf
+    clientConf, getWireGuardPeers
 };
