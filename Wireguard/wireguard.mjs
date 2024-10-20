@@ -375,30 +375,27 @@ function parseWireGuardOutput(output) {
                 var config = fs.readFileSync(path.join(wireguardDir, `client-${ipWithoutSubnet}.conf`), "utf-8")
                 lastPeer.config = config;
             }
-            // const ip = allowedIpsMatch[1]
-            // interfaces[currentInterface].peers.push({ allowedIps: allowedIpsMatch[1] });
-            // const ipWithoutSubnet = ip.split('/')[0];
-            // var config = fs.readFileSync(path.join(wireguardDir, `client-${ipWithoutSubnet}.conf`), "utf-8")
-            // interfaces[currentInterface].peers.push({ config: JSON.stringify(config) });
         }
 
 
-        const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
-        
+
+
         // Check for latest handshake
         const handshakeMatch = line.match(/latest handshake: (.+)/);
 
         if (handshakeMatch && currentInterface) {
             const latestHandshake = parseHandshakeTime(handshakeMatch[1]);
-
+            const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
             if (lastPeer && latestHandshake && latestHandshake < thirtyMinutesAgo) {
                 lastPeer.latestHandshake = handshakeMatch[1];
                 lastPeer.inactive = true; // Mark as inactive
             }
-        }
+        } else if (handshakeMatch == null && currentInterface) {
+            const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
+            if (lastPeer) {
+                lastPeer.inactive = true;
+            }
 
-        if (handshakeMatch == null && currentInterface && lastPeer) {
-            lastPeer.inactive = true;
         }
     });
 
