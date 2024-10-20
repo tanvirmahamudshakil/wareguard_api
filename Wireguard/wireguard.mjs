@@ -387,11 +387,11 @@ function parseWireGuardOutput(output) {
                 lastPeer.latestHandshake = handshakeMatch[1];
                 lastPeer.inactive = true; // Mark as inactive
             }
-        } else {
-            const latestHandshake = parseHandshakeTime("13 minutes, 19 seconds ago");
+        } else if (line.includes("latest handshake: (none)") && currentInterface) {
             const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
-            if (lastPeer && latestHandshake && latestHandshake < thirtyMinutesAgo) {
-                lastPeer.latestHandshake = "13 minutes, 19 seconds ago";
+
+            if (lastPeer) {
+                lastPeer.latestHandshake = "Never connected";
                 lastPeer.inactive = true; // Mark as inactive
             }
         }
