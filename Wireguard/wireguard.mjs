@@ -381,7 +381,7 @@ function parseWireGuardOutput(output) {
             }
         }
 
-        if (handshakeMatch == null && currentInterface) {
+        if (handshakeMatch == null && currentInterface && lastPeer) {
             lastPeer.inactive = true;
         }
     });
