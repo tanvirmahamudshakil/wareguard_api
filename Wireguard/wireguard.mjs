@@ -210,7 +210,7 @@ function NewClientCreate(req, res) {
         const clientIP = generateClientIP((index + 1));
         const clientPrivateKey1 = execSync('wg genkey').toString().trim();
         const clientPublicKey1 = execSync(`echo ${clientPrivateKey1} | wg pubkey`).toString().trim();
-        const clientConfPath = path.join(wireguardDir, `client-${clientPublicKey1}.conf`);
+        const clientConfPath = path.join(wireguardDir, `client-${clientIP}.conf`);
 
         const serverPublicKey = fs.readFileSync(path.join(wireguardDir, 'server-public.key'), "utf-8")
         const host = req.get('host');
