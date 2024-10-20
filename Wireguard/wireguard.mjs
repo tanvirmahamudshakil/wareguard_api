@@ -317,7 +317,6 @@ function getWireGuardPeers(req, res) {
         // Parse the output
         const output = stdout;
         const interfaces = parseWireGuardOutput(output);
-        console.log(interfaces);
         res.json(interfaces)
     });
 }
@@ -341,6 +340,14 @@ function parseWireGuardOutput(output) {
         const peerMatch = line.match(/^peer: (\S+)/);
         if (peerMatch && currentInterface) {
             interfaces[currentInterface].peers.push({ publicKey: peerMatch[1] });
+        }
+
+        const allowedIpsMatch = line.match(/allowed ips: (.+)/);
+        if (allowedIpsMatch && currentInterface) {
+            const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
+            if (lastPeer) {
+                lastPeer.allowedIps = allowedIpsMatch[1];
+            }
         }
 
         // Check for latest handshake
