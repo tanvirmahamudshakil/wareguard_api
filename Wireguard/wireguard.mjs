@@ -221,7 +221,7 @@ function NewClientCreate(req, res) {
         const peerConfig = `
 [Peer]
 PublicKey = ${clientPublicKey1}
-AllowedIPs = ${clientIP}
+AllowedIPs = ${clientIP}/32
 `;
 
         fs.appendFileSync(serverConfPath, peerConfig);
@@ -231,7 +231,7 @@ AllowedIPs = ${clientIP}
         const clientConf = `
 [Interface]
 PrivateKey = ${clientPrivateKey1}
-Address = ${clientIP}
+Address = ${clientIP}/32
 DNS = 1.1.1.1
 
 [Peer]
@@ -268,7 +268,7 @@ function generateClientIP(clientIndex) {
     const baseIP = '10.8'; // The base IP block (can be modified)
     const subnet = Math.floor(clientIndex / 254); // Move to the next subnet after 254 clients
     const host = (clientIndex % 254) + 1; // Increment host address from 1 to 254
-    return `${baseIP}.${subnet}.${host}/32`;
+    return `${baseIP}.${subnet}.${host}`;
 }
 
 
