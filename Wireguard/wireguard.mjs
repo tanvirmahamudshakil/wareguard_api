@@ -357,7 +357,23 @@ function parseWireGuardOutput(output) {
         if (allowedIpsMatch && currentInterface) {
             const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
             if (lastPeer) {
+
                 lastPeer.allowedIps = allowedIpsMatch[1];
+            }
+            // const ip = allowedIpsMatch[1]
+            // interfaces[currentInterface].peers.push({ allowedIps: allowedIpsMatch[1] });
+            // const ipWithoutSubnet = ip.split('/')[0];
+            // var config = fs.readFileSync(path.join(wireguardDir, `client-${ipWithoutSubnet}.conf`), "utf-8")
+            // interfaces[currentInterface].peers.push({ config: JSON.stringify(config) });
+        }
+
+        if (allowedIpsMatch && currentInterface) {
+            const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
+            if (lastPeer) {
+                const ip = allowedIpsMatch[1]
+                const ipWithoutSubnet = ip.split('/')[0];
+                var config = fs.readFileSync(path.join(wireguardDir, `client-${ipWithoutSubnet}.conf`), "utf-8")
+                lastPeer.config = config;
             }
             // const ip = allowedIpsMatch[1]
             // interfaces[currentInterface].peers.push({ allowedIps: allowedIpsMatch[1] });
@@ -368,7 +384,7 @@ function parseWireGuardOutput(output) {
 
 
         const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
-        console.log(lastPeer)
+        
         // Check for latest handshake
         const handshakeMatch = line.match(/latest handshake: (.+)/);
 
