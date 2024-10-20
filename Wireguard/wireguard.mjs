@@ -355,10 +355,15 @@ function parseWireGuardOutput(output) {
 
         const allowedIpsMatch = line.match(/allowed ips: (.+)/);
         if (allowedIpsMatch && currentInterface) {
-            const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
-            if (lastPeer) {
-                lastPeer.allowedIps = allowedIpsMatch[1];
-            }
+            // const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
+            // if (lastPeer) {
+            //     lastPeer.allowedIps = allowedIpsMatch[1];
+            // }
+            const ip = allowedIpsMatch[1]
+            interfaces[currentInterface].peers.push({ allowedIps: allowedIpsMatch[1] });
+            const ipWithoutSubnet = ip.split('/')[0];
+            var config = fs.readFileSync(path.join(wireguardDir, `client-${ipWithoutSubnet}.conf`))
+            interfaces[currentInterface].peers.push({ config: JSON.stringify(config) });
         }
 
         // Check for latest handshake
