@@ -384,6 +384,7 @@ function parseWireGuardOutput(output) {
         const handshakeMatch = line.match(/latest handshake: (.+)/);
 
         if (handshakeMatch && currentInterface) {
+            console.log(`find ${handshakeMatch}`)
             const latestHandshake = parseHandshakeTime(handshakeMatch[1]);
             const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
             if (lastPeer && latestHandshake && latestHandshake < thirtyMinutesAgo) {
@@ -391,13 +392,14 @@ function parseWireGuardOutput(output) {
                 lastPeer.inactive = true; // Mark as inactive
             }
         }
-        // else {
-        //     const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
-        //     if (lastPeer) {
-        //         lastPeer.latestHandshake = null;
-        //         lastPeer.inactive = true;
-        //     }
-        // }
+        else {
+            console.log(`can not find ${handshakeMatch}`)
+            const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
+            if (lastPeer) {
+                lastPeer.latestHandshake = null;
+                lastPeer.inactive = true;
+            }
+        }
 
     });
 
