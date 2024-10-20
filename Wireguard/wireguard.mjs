@@ -268,7 +268,7 @@ function generateClientIP(clientIndex) {
     const baseIP = '10.8'; // The base IP block (can be modified)
     const subnet = Math.floor(clientIndex / 254); // Move to the next subnet after 254 clients
     const host = (clientIndex % 254) + 1; // Increment host address from 1 to 254
-    return `${baseIP}.${subnet}.${host}`;
+    return `${baseIP}.${subnet}.${host}/32`;
 }
 
 
