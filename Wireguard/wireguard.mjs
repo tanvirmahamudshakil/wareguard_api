@@ -390,15 +390,20 @@ function parseWireGuardOutput(output) {
                 lastPeer.latestHandshake = handshakeMatch[1];
                 lastPeer.inactive = true; // Mark as inactive
             }
-        }
-        if (!handshakeMatch && currentInterface) {
-            console.log(`${handshakeMatch} ---- ${currentInterface}`)
+        } else {
             const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
             if (lastPeer) {
                 lastPeer.inactive = true;
             }
-
         }
+        // if (handshakeMatch[1] == null && currentInterface) {
+        //     console.log(`${handshakeMatch[1]} ---- ${currentInterface}`)
+        //     const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
+        //     if (lastPeer) {
+        //         lastPeer.inactive = true;
+        //     }
+
+        // }
     });
 
 
