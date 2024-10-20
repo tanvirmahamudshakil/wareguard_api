@@ -377,23 +377,21 @@ function parseWireGuardOutput(output) {
 
         // Check for latest handshake
         const handshakeMatch = line.match(/latest handshake: (.+)/);
+        const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
 
-        if (handshakeMatch && currentInterface) {
-
+        if (handshakeMatch && lastPeer) {
             const latestHandshake = parseHandshakeTime(handshakeMatch[1]);
-            const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
-            console.log(`find ${handshakeMatch} --- ${lastPeer.allowedIps}`)
-            if (lastPeer && latestHandshake && latestHandshake < thirtyMinutesAgo) {
-                lastPeer.latestHandshake = handshakeMatch[1];
-                lastPeer.inactive = true; // Mark as inactive
-            }
-        } else if (line.includes("latest handshake: (none)") && currentInterface) {
-            const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
+            lastPeer.latestHandshake = handshakeMatch[1];
 
-            if (lastPeer) {
-                lastPeer.latestHandshake = "Never connected";
-                lastPeer.inactive = true; // Mark as inactive
+            if (latestHandshake && latestHandshake < thirtyMinutesAgo) {
+                lastPeer.inactive = true; // Mark as inactive if handshake is older than 30 minutes
             }
+        }
+
+        // If there's no handshake at all, mark peer as inactive
+        if (!handshakeMatch && lastPeer) {
+            lastPeer.latestHandshake = "Never connected";
+            lastPeer.inactive = true; // Mark as inactive if there's no handshake found
         }
 
 
@@ -403,7 +401,7 @@ function parseWireGuardOutput(output) {
     // Filter only inactive peers
     const inactivePeers = {};
     for (let iface in interfaces) {
-        inactivePeers[iface] = interfaces[iface].peers.filter(peer => peer.inactive == true);
+        inactivePeers[iface] = interfaces[iface].peers.filter(peer => peer.inactive === true);
     }
 
     return inactivePeers;
