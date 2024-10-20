@@ -190,26 +190,31 @@ function ClientRun() {
 function NewClientCreate(req, res) {
     const clientPrivateKey1 = execSync('wg genkey').toString().trim();
     const clientPublicKey1 = execSync(`echo ${clientPrivateKey1} | wg pubkey`).toString().trim();
-    const peers = extractAllowedIPs(serverConfPath);
+    const clientConfPath = path.join(wireguardDir, `client-${req.query.userid}.conf`);
+    const clientExit = fs.existsSync(clientConfPath)
+    if (clientExit) {
+        const clientconf = fs.readFileSync(clientConfPath, 'utf8')
+        res.send(clientconf)
+         
+    } else {
+        const peers = extractAllowedIPs(serverConfPath);
+        const clientIP = `10.0.0.${peers.length + 2}/24`; // Adjust IP logic as needed
 
-
-    const clientIP = `10.0.0.${peers.length + 2}/24`; // Adjust IP logic as needed
-
-    // Append new peer (client) to the server's wg0.conf file
-    const peerConfig = `
+        // Append new peer (client) to the server's wg0.conf file
+        const peerConfig = `
 [Peer]
 PublicKey = ${clientPublicKey1}
 AllowedIPs = ${clientIP}
 `;
 
-    fs.appendFileSync(serverConfPath, peerConfig);
+        fs.appendFileSync(serverConfPath, peerConfig);
 
 
 
 
-    //   Generate client configuration file (client.conf)
-    const serverPublicKey = getServerPublicKey(); // Retrieve the server's public key
-    const clientConf = `
+        //   Generate client configuration file (client.conf)
+        const serverPublicKey = getServerPublicKey(); // Retrieve the server's public key
+        const clientConf = `
 [Interface]
 PrivateKey = ${clientPrivateKey1}
 Address = ${clientIP}
@@ -223,19 +228,22 @@ PersistentKeepalive = 25
 `;
 
 
-    const clientConfPath = path.join(wireguardDir, `client-${peers.length + 2}.conf`);
-    fs.writeFileSync(clientConfPath, clientConf);
-    console.log(useIpList)
-    res.send(clientConf);
 
-    // exec('sudo systemctl restart wg-quick@wg0.service', (error, stdout, stderr) => {
-    //     if (error) {
-    //         console.error(`Error restarting WireGuard service: ${error.message}`);
-    //         return res.status(500).json({ error: 'Failed to restart WireGuard service' });
-    //     }
+        fs.writeFileSync(clientConfPath, clientConf);
+        console.log(useIpList)
+        res.send(clientConf);
 
-    //     res.send(clientConf);
-    // });
+        // exec('sudo systemctl restart wg-quick@wg0.service', (error, stdout, stderr) => {
+        //     if (error) {
+        //         console.error(`Error restarting WireGuard service: ${error.message}`);
+        //         return res.status(500).json({ error: 'Failed to restart WireGuard service' });
+        //     }
+
+        //     res.send(clientConf);
+        // });
+    }
+
+
 
 }
 

@@ -12,6 +12,11 @@ import {
 const app = express();
 
 
+app.get("/route", async (req, res) => {
+
+    res.status(200).send(req.query.userid);
+});
+
 
 app.get("/new_server", async (req, res) => {
     var d = await NewServerCreate()
