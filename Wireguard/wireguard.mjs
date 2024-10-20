@@ -393,7 +393,7 @@ function parseWireGuardOutput(output) {
                 lastPeer.inactive = true; // Mark as inactive
             }
         }
-        else {
+        else if (handshakeMatch == null && allowedIpsMatch && peerMatch) {
 
             const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
             console.log(`can not find ${handshakeMatch} ---${lastPeer.allowedIps}`)
