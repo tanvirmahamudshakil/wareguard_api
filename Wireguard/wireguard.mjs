@@ -384,17 +384,19 @@ function parseWireGuardOutput(output) {
         const handshakeMatch = line.match(/latest handshake: (.+)/);
 
         if (handshakeMatch && currentInterface) {
-            console.log(`find ${handshakeMatch}`)
+
             const latestHandshake = parseHandshakeTime(handshakeMatch[1]);
             const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
+            console.log(`find ${handshakeMatch} --- ${lastPeer.allowedIps}`)
             if (lastPeer && latestHandshake && latestHandshake < thirtyMinutesAgo) {
                 lastPeer.latestHandshake = handshakeMatch[1];
                 lastPeer.inactive = true; // Mark as inactive
             }
         }
         else {
-            console.log(`can not find ${handshakeMatch}`)
+
             const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
+            console.log(`can not find ${handshakeMatch} ---${lastPeer.allowedIps}`)
             if (lastPeer) {
                 lastPeer.latestHandshake = null;
                 lastPeer.inactive = true;
