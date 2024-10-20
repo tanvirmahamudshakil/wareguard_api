@@ -326,7 +326,7 @@ function getWireGuardPeers(req, res) {
 function parseWireGuardOutput(output) {
     const interfaces = {};
     const lines = output.split('\n');
-    const thirtyMinutesAgo = Date.now() - 30 * 60 * 1000; // 30 minutes in milliseconds
+    const thirtyMinutesAgo = Date.now() - 1 * 60 * 1000; // 30 minutes in milliseconds
     let currentInterface = null;
 
     lines.forEach(line => {
