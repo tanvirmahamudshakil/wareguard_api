@@ -372,7 +372,10 @@ function parseWireGuardOutput(output) {
             const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
             const latestHandshake = parseHandshakeTime(handshakeMatch[1]);
 
-            if (lastPeer && latestHandshake && latestHandshake < thirtyMinutesAgo) {
+            if (latestHandshake == null) {
+                lastPeer.latestHandshake = handshakeMatch[1];
+                lastPeer.inactive = true; // Mark as inactive
+            } else if (lastPeer && (latestHandshake) && latestHandshake < thirtyMinutesAgo) {
                 lastPeer.latestHandshake = handshakeMatch[1];
                 lastPeer.inactive = true; // Mark as inactive
             }
