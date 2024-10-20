@@ -395,6 +395,7 @@ function parseWireGuardOutput(output) {
 
             const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
             if (lastPeer) {
+                lastPeer.latestHandshake = null;
                 lastPeer.inactive = true;
             }
 
@@ -405,7 +406,7 @@ function parseWireGuardOutput(output) {
     // Filter only inactive peers
     const inactivePeers = {};
     for (let iface in interfaces) {
-        inactivePeers[iface] = interfaces[iface].peers.filter(peer => peer.inactive == true);
+        inactivePeers[iface] = interfaces[iface].peers.filter(peer => peer.inactive == true && (peer.latestHandshake != null || peer.latestHandshake == null));
     }
 
     return inactivePeers;
