@@ -231,16 +231,16 @@ PersistentKeepalive = 25
 
 
         fs.writeFileSync(clientConfPath, clientConf);
-        res.send(clientConf);
+        // res.send(clientConf);
 
-        // exec('sudo systemctl restart wg-quick@wg0.service', (error, stdout, stderr) => {
-        //     if (error) {
-        //         console.error(`Error restarting WireGuard service: ${error.message}`);
-        //         return res.status(500).json({ error: 'Failed to restart WireGuard service' });
-        //     }
+        exec('sudo systemctl restart wg-quick@wg0.service', (error, stdout, stderr) => {
+            if (error) {
+                console.error(`Error restarting WireGuard service: ${error.message}`);
+                return res.status(500).json({ error: 'Failed to restart WireGuard service' });
+            }
 
-        //     res.send(clientConf);
-        // });
+            res.send(clientConf);
+        });
     }
 
 
