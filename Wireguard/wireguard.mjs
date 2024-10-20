@@ -318,7 +318,7 @@ function getWireGuardPeers(req, res) {
         const output = stdout;
         const interfaces = parseWireGuardOutput(output);
         console.log(interfaces);
-        req.json(interfaces)
+        res.json(interfaces)
     });
 }
 
