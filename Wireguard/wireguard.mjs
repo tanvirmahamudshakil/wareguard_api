@@ -390,7 +390,8 @@ function parseWireGuardOutput(output) {
                 lastPeer.latestHandshake = handshakeMatch[1];
                 lastPeer.inactive = true; // Mark as inactive
             }
-        } else if (handshakeMatch == null && currentInterface) {
+        }
+        if (!handshakeMatch && currentInterface) {
             const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
             if (lastPeer) {
                 lastPeer.inactive = true;
