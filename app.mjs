@@ -12,6 +12,12 @@ import {
 const app = express();
 
 
+app.get("/get-ip", async (req, res) => {
+    const clientIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    res.status(200).send(clientIp);
+});
+
+
 app.get("/route", async (req, res) => {
 
     res.status(200).send(req.query.userid);
