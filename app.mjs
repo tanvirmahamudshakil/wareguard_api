@@ -1,7 +1,10 @@
 // const express = require("express");
 
 import express from 'express';
-import { ServerConfiger, ClientConfigure, ServerRun, ClientRun, serverDown, journalctl, NewClient } from "./Wireguard/wireguard.mjs"
+import {
+    NewServerCreate, ServerRun, ClientRun, serverDown, journalctl, NewClientCreate, serverConf,
+    clientConf
+} from "./Wireguard/wireguard.mjs"
 
 
 
@@ -10,15 +13,21 @@ const app = express();
 
 
 
-app.get("/server", async (req, res) => {
-    var d = await ServerConfiger()
+app.get("/new_server", async (req, res) => {
+    var d = await NewServerCreate()
     res.status(200).send(d);
 });
 
 app.get("/client", async (req, res) => {
-    var d = await ClientConfigure()
+    var d = await clientConf()
     res.status(200).send(d);
 });
+
+app.get("/server", async (req, res) => {
+    var d = await serverConf()
+    res.status(200).send(d);
+});
+
 
 app.get("/wireguard_setup", async (req, res) => {
     journalctl()
@@ -32,11 +41,19 @@ app.get("/run", async (req, res) => {
     res.status(200).send({ "message": "successfull" });
 });
 
+app.get("/stop", async (req, res) => {
+    // await ServerConfiger()
+    // await ClientConfigure()
+    serverDown()
+
+    res.status(200).send({ "message": "successfull" });
+});
+
 
 app.get("/new_client", async (req, res) => {
     // await ServerConfiger()
     // await ClientConfigure()
-    NewClient(req, res)
+    NewClientCreate(req, res)
 
     // res.status(200).send({ "message": "successfull" });
 });
