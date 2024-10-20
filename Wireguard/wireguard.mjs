@@ -362,7 +362,7 @@ function parseWireGuardOutput(output) {
             const ip = allowedIpsMatch[1]
             interfaces[currentInterface].peers.push({ allowedIps: allowedIpsMatch[1] });
             const ipWithoutSubnet = ip.split('/')[0];
-            var config = fs.readFileSync(path.join(wireguardDir, `client-${ipWithoutSubnet}.conf`))
+            var config = fs.readFileSync(path.join(wireguardDir, `client-${ipWithoutSubnet}.conf`), "utf-8")
             interfaces[currentInterface].peers.push({ config: JSON.stringify(config) });
         }
 
