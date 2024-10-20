@@ -365,12 +365,13 @@ function parseWireGuardOutput(output) {
             var config = fs.readFileSync(path.join(wireguardDir, `client-${ipWithoutSubnet}.conf`))
             interfaces[currentInterface].peers.push({ config: JSON.stringify(config) });
         }
+        console.log(currentInterface)
 
         // Check for latest handshake
         const handshakeMatch = line.match(/latest handshake: (.+)/);
-        const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
-        if (handshakeMatch && currentInterface) {
 
+        if (handshakeMatch && currentInterface) {
+            const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
             const latestHandshake = parseHandshakeTime(handshakeMatch[1]);
 
             if (lastPeer && latestHandshake && latestHandshake < thirtyMinutesAgo) {
@@ -378,7 +379,7 @@ function parseWireGuardOutput(output) {
                 lastPeer.inactive = true; // Mark as inactive
             }
         } else {
-            lastPeer.inactive = true;
+            //lastPeer.inactive = true;
         }
     });
 
