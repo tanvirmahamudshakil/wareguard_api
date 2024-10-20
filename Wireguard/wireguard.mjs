@@ -192,6 +192,7 @@ function NewClientCreate(req, res) {
     const clientPublicKey1 = execSync(`echo ${clientPrivateKey1} | wg pubkey`).toString().trim();
     const clientConfPath = path.join(wireguardDir, `client-${req.query.userid}.conf`);
     const clientExit = fs.existsSync(clientConfPath)
+    const host = req.get('host');
     if (clientExit) {
         const clientconf = fs.readFileSync(clientConfPath, 'utf8')
         res.send(clientconf)
@@ -222,7 +223,7 @@ DNS = 1.1.1.1
 
 [Peer]
 PublicKey = ${serverPublicKey}
-Endpoint = 143.110.176.147:51820
+Endpoint = ${host}:51820
 AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 25
 `;
@@ -230,7 +231,6 @@ PersistentKeepalive = 25
 
 
         fs.writeFileSync(clientConfPath, clientConf);
-        console.log(useIpList)
         res.send(clientConf);
 
         // exec('sudo systemctl restart wg-quick@wg0.service', (error, stdout, stderr) => {
