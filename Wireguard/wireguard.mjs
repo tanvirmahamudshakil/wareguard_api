@@ -366,7 +366,7 @@ function parseWireGuardOutput(output) {
             interfaces[currentInterface].peers.push({ config: JSON.stringify(config) });
         }
 
-        console.log(allowedIpsMatch)
+
         // Check for latest handshake
         const handshakeMatch = line.match(/latest handshake: (.+)/);
 
@@ -383,6 +383,7 @@ function parseWireGuardOutput(output) {
         }
     });
 
+    console.log(interfaces)
     // Filter only inactive peers
     const inactivePeers = {};
     for (let iface in interfaces) {
