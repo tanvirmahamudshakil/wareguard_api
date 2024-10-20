@@ -368,8 +368,9 @@ function parseWireGuardOutput(output) {
 
         // Check for latest handshake
         const handshakeMatch = line.match(/latest handshake: (.+)/);
+        const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
         if (handshakeMatch && currentInterface) {
-            const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
+
             const latestHandshake = parseHandshakeTime(handshakeMatch[1]);
 
             if (lastPeer && latestHandshake && latestHandshake < thirtyMinutesAgo) {
