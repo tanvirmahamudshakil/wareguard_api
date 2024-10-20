@@ -193,7 +193,7 @@ function NewClientCreate(req, res) {
     const peers = extractAllowedIPs(serverConfPath);
 
 
-    const clientIP = `10.0.0.${peers.length + 1}/24`; // Adjust IP logic as needed
+    const clientIP = `10.0.0.${peers.length + 2}/24`; // Adjust IP logic as needed
 
     // Append new peer (client) to the server's wg0.conf file
     const peerConfig = `
@@ -223,7 +223,7 @@ PersistentKeepalive = 25
 `;
 
 
-    const clientConfPath = path.join(wireguardDir, `client-${peers.length + 1}.conf`);
+    const clientConfPath = path.join(wireguardDir, `client-${peers.length + 2}.conf`);
     fs.writeFileSync(clientConfPath, clientConf);
     console.log(useIpList)
     res.send(clientConf);
