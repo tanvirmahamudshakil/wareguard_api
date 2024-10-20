@@ -352,7 +352,7 @@ function parseWireGuardOutput(output) {
         if (peerMatch && currentInterface) {
             interfaces[currentInterface].peers.push({ publicKey: peerMatch[1] });
         }
-        console.log(peerMatch)
+
         const allowedIpsMatch = line.match(/allowed ips: (.+)/);
         if (allowedIpsMatch && currentInterface) {
             // const lastPeer = interfaces[currentInterface].peers[interfaces[currentInterface].peers.length - 1];
@@ -366,7 +366,7 @@ function parseWireGuardOutput(output) {
             interfaces[currentInterface].peers.push({ config: JSON.stringify(config) });
         }
 
-
+        console.log(allowedIpsMatch)
         // Check for latest handshake
         const handshakeMatch = line.match(/latest handshake: (.+)/);
 
