@@ -431,8 +431,13 @@ function parseHandshakeTime(handshakeStr) {
     return null;
 }
 
+async function singleClientProfile(req, res) {
+    var config = fs.readFileSync(path.join(wireguardDir, `client-${req.query.ip}.conf`), "utf-8")
+    res.send(config)
+}
+
 
 export {
     NewServerCreate, ServerRun, ClientRun, serverDown, journalctl, NewClientCreate, serverConf,
-    clientConf, getWireGuardPeers
+    clientConf, getWireGuardPeers, singleClientProfile
 };

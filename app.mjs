@@ -3,7 +3,7 @@
 import express from 'express';
 import {
     NewServerCreate, ServerRun, ClientRun, serverDown, journalctl, NewClientCreate, serverConf,
-    clientConf, getWireGuardPeers
+    clientConf, getWireGuardPeers, singleClientProfile
 } from "./Wireguard/wireguard.mjs"
 
 
@@ -11,6 +11,10 @@ import {
 
 const app = express();
 
+
+app.get("/single-profile", async (req, res) => {
+    singleClientProfile(req, res)
+});
 
 app.get("/activeprofile", async (req, res) => {
     getWireGuardPeers(req, res)
