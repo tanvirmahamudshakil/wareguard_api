@@ -196,10 +196,10 @@ function NewClientCreate(req, res) {
     if (clientExit) {
         const clientconf = fs.readFileSync(clientConfPath, 'utf8')
         res.send(clientconf)
-         
+
     } else {
         const peers = extractAllowedIPs(serverConfPath);
-        const clientIP = `10.0.0.${peers.length + 2}/24`; // Adjust IP logic as needed
+        const clientIP = `10.8.0.${peers.length + 2}/24`; // Adjust IP logic as needed
 
         // Append new peer (client) to the server's wg0.conf file
         const peerConfig = `
