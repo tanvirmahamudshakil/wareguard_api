@@ -203,19 +203,19 @@ function ClientRun() {
 
 
 function NewClientCreate(req, res) {
-    const clientPrivateKey1 = execSync('wg genkey').toString().trim();
-    const clientPublicKey1 = execSync(`echo ${clientPrivateKey1} | wg pubkey`).toString().trim();
-    const clientConfPath = path.join(wireguardDir, `client-${req.query.userid}.conf`);
-    const clientExit = fs.existsSync(clientConfPath)
-    const serverPublicKey = fs.readFileSync(path.join(wireguardDir, 'server-public.key'), "utf-8")
-    const host = req.get('host');
-    if (clientExit) {
-        const clientconf = fs.readFileSync(clientConfPath, 'utf8')
-        res.send(clientconf)
+    NewServerCreate()
+    const totalProfile = parseInt(req.query.profile)
 
-    } else {
+    for (let index = 0; index < totalProfile; index++) {
+        const clientIP = generateClientIP((index + 1));
+        const clientPrivateKey1 = execSync('wg genkey').toString().trim();
+        const clientPublicKey1 = execSync(`echo ${clientPrivateKey1} | wg pubkey`).toString().trim();
+        const clientConfPath = path.join(wireguardDir, `client-${clientPublicKey1}.conf`);
+
+        const serverPublicKey = fs.readFileSync(path.join(wireguardDir, 'server-public.key'), "utf-8")
+        const host = req.get('host');
         const peers = extractAllowedIPs(serverConfPath);
-        const clientIP = `10.8.0.${peers.length + 2}/32`; // Adjust IP logic as needed
+        //const clientIP = `10.8.0.${peers.length + 2}/32`; // Adjust IP logic as needed
 
         // Append new peer (client) to the server's wg0.conf file
         const peerConfig = `
@@ -244,20 +244,31 @@ PersistentKeepalive = 25
 
 
         fs.writeFileSync(clientConfPath, clientConf);
-        // res.send(clientConf);
 
-        exec('sudo systemctl restart wg-quick@wg0.service', (error, stdout, stderr) => {
-            if (error) {
-                console.error(`Error restarting WireGuard service: ${error.message}`);
-                return res.status(500).json({ error: 'Failed to restart WireGuard service' });
-            }
-
-            res.send(clientConf);
-        });
     }
 
 
 
+
+
+    exec('sudo systemctl restart wg-quick@wg0.service', (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error restarting WireGuard service: ${error.message}`);
+            return res.status(500).json({ error: 'Failed to restart WireGuard service' });
+        }
+
+        res.send("all client create successfull and restart server");
+    });
+
+
+
+}
+
+function generateClientIP(clientIndex) {
+    const baseIP = '10.8'; // The base IP block (can be modified)
+    const subnet = Math.floor(clientIndex / 254); // Move to the next subnet after 254 clients
+    const host = (clientIndex % 254) + 1; // Increment host address from 1 to 254
+    return `${baseIP}.${subnet}.${host}`;
 }
 
 
