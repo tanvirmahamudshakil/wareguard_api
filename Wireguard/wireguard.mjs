@@ -80,7 +80,7 @@ async function clientConf() {
 
 
 function journalctl() {
-   
+
 
     exec('sudo ufw allow 51820/udp', (error, stdout, stderr) => {
         if (error) {
@@ -201,13 +201,11 @@ function NewClientCreate(req, res) {
 PublicKey = ${clientPublicKey1}
 AllowedIPs = ${clientIP}
 `;
-    try {
-        fs.appendFileSync(serverConfPath, peerConfig);
-        var d = fs.readFileSync(serverConfPath, "utf8")
-        res.send(d);
-    } catch (error) {
-        res.send(error);
-    }
+
+    fs.appendFileSync(serverConfPath, peerConfig);
+
+
+
 
     //   Generate client configuration file (client.conf)
     const serverPublicKey = getServerPublicKey(); // Retrieve the server's public key
