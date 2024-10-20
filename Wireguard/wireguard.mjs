@@ -33,7 +33,7 @@ const clientConfPath = path.join(wireguardDir, 'client.conf');
 async function NewServerCreate() {
     const wg0Conf = `
 [Interface]
-Address = 10.8.0.1/24
+Address = 10.8.0.1/32
 PrivateKey = ${serverPrivateKey}
 PostUp = ufw route allow in on wg0 out on eth0
 PostUp = iptables -t nat -I POSTROUTING -o eth0 -j MASQUERADE
@@ -199,7 +199,7 @@ function NewClientCreate(req, res) {
 
     } else {
         const peers = extractAllowedIPs(serverConfPath);
-        const clientIP = `10.8.0.${peers.length + 2}/24`; // Adjust IP logic as needed
+        const clientIP = `10.8.0.${peers.length + 2}/32`; // Adjust IP logic as needed
 
         // Append new peer (client) to the server's wg0.conf file
         const peerConfig = `
