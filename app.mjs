@@ -1,7 +1,7 @@
 // const express = require("express");
 
 import express from 'express';
-import { middle } from "./middleware/auth.mjs";
+import middle from "./middleware/auth.mjs";
 import {
     NewServerCreate, ServerRun, ClientRun, serverDown, journalctl, NewClientCreate, serverConf,
     clientConf, getWireGuardPeers, singleClientProfile
