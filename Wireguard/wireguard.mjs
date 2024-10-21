@@ -23,18 +23,6 @@ async function generateServerKey() {
 }
 
 
-// const serverPrivateKey = execSync('wg genkey').toString().trim();
-// const serverPublicKey = execSync(`echo ${serverPrivateKey} | wg pubkey`).toString().trim();
-// // const clientPrivateKey = execSync('wg genkey').toString().trim();
-// // const clientPublicKey = execSync(`echo ${clientPrivateKey} | wg pubkey`).toString().trim();
-
-// // Save keys
-// fs.writeFileSync(path.join(wireguardDir, 'server-private.key'), serverPrivateKey);
-// fs.writeFileSync(path.join(wireguardDir, 'server-public.key'), serverPublicKey);
-// fs.writeFileSync(path.join(wireguardDir, 'client-private.key'), clientPrivateKey);
-// fs.writeFileSync(path.join(wireguardDir, 'client-public.key'), clientPublicKey);
-
-
 var useIpList = []
 
 
@@ -45,7 +33,6 @@ const clientConfPath = path.join(wireguardDir, 'client.conf');
 async function NewServerCreate() {
     generateServerKey()
     const serverPrivateKey = fs.readFileSync(path.join(wireguardDir, 'server-private.key'), "utf-8")
-
     const wg0Conf = `
 [Interface]
 Address = 10.8.0.1/32
@@ -56,7 +43,6 @@ PreDown = ufw route delete allow in on wg0 out on eth0
 PreDown = iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
 ListenPort = 51820
 `;
-
     fs.writeFileSync(serverConfPath, wg0Conf);
     execSync(`sudo chmod 600 ${serverConfPath}`)
     return fs.readFileSync(`${serverConfPath}`, 'utf8')
@@ -72,31 +58,8 @@ async function clientConf() {
 }
 
 
-// // Client configuration
-// async function ClientConfigure() {
-//     const clientConf =
-// `[Interface]
-// Address = 10.8.0.2/24
-// PrivateKey = ${clientPrivateKey}
-// DNS = 1.1.1.1
-
-// [Peer]
-// PublicKey = ${serverPublicKey}
-// Endpoint = 143.110.176.147:51820
-// AllowedIPs = 0.0.0.0/0
-// PersistentKeepalive = 15
-// `;
-
-//     useIpList.push("10.8.0.2")
-//     fs.writeFileSync(clientConfPath, clientConf);
-//     return fs.readFileSync(`${clientConfPath}`, 'utf8')
-// }
-
-
 
 function journalctl() {
-
-
     exec('sudo ufw allow 51820/udp', (error, stdout, stderr) => {
         if (error) {
             console.error(`Error: ${error.message}`);

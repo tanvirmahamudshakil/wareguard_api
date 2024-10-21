@@ -16,7 +16,7 @@ app.get("/single-profile", async (req, res) => {
     singleClientProfile(req, res)
 });
 
-app.get("/activeprofile", async (req, res) => {
+app.get("/inactive-profile", async (req, res) => {
     getWireGuardPeers(req, res)
 });
 
