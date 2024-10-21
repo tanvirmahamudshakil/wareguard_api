@@ -384,7 +384,11 @@ function parseWireGuardOutput(output) {
             lastPeer.latestHandshake = handshakeMatch[1];
 
             if (latestHandshake && latestHandshake < thirtyMinutesAgo) {
+                lastPeer.latestHandshake = "Never connected";
                 lastPeer.inactive = true; // Mark as inactive if handshake is older than 30 minutes
+            } else {
+                lastPeer.latestHandshake = "connected";
+                lastPeer.inactive = false;
             }
         }
 
