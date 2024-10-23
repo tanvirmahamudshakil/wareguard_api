@@ -307,7 +307,7 @@ function parseWireGuardOutput(output) {
         const interfaceMatch = line.match(/^interface: (\S+)/);
         if (interfaceMatch) {
             currentInterface = interfaceMatch[1];
-            interfaces[currentInterface] = { peers: [] };
+            interfaces[currentInterface] = { peers: [], activeCount: 0 };
         }
 
         // Check for peer
