@@ -352,6 +352,7 @@ function parseWireGuardOutput(output) {
             } else {
                 lastPeer.latestHandshake = "connected";
                 lastPeer.inactive = false;
+                interfaces[currentInterface].activeCount += 1;
             }
         }
 
@@ -366,9 +367,13 @@ function parseWireGuardOutput(output) {
 
 
     // Filter only inactive peers
-    const inactivePeers = {};
+    const inactivePeers = {
+        inactivePeers: {},
+        totalActiveProfiles: 0
+    };
     for (let iface in interfaces) {
-        inactivePeers[iface] = interfaces[iface].peers.filter(peer => peer.inactive === true);
+        inactivePeers.inactivePeers[iface] = interfaces[iface].peers.filter(peer => peer.inactive === true);
+        inactivePeers.totalActiveProfiles += interfaces[iface].activeCount;
     }
 
     return inactivePeers;
