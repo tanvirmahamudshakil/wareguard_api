@@ -10,7 +10,8 @@ import {
 
 function getInterfaceNames() {
     const networkInterfaces = os.networkInterfaces();
-    return Object.keys(networkInterfaces);
+    const allkey = Object.keys(networkInterfaces);
+    return allkey.length > 1 ? allkey[1] : allkey[0];
 }
 
 
