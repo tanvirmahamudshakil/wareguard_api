@@ -1,4 +1,5 @@
 import path from 'path'
+import os from "os";
 import { WgConfig, createPeerPairs } from "wireguard-tools"
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -9,6 +10,12 @@ const wireguardDir = '/etc/wireguard/';
 
 // const __filename = fileURLToPath(import.meta.url);
 // const __dirname = dirname(__filename);
+
+function getInterfaceNames() {
+    const networkInterfaces = os.networkInterfaces();
+    const allkey = Object.keys(networkInterfaces);
+    return allkey.length > 1 ? allkey[1] : allkey[0];
+}
 
 
 async function generateServerKey() {
@@ -32,15 +39,16 @@ const clientConfPath = path.join(wireguardDir, 'client.conf');
 // Server configuration
 async function NewServerCreate() {
     generateServerKey()
+    var interfacename = getInterfaceNames()
     const serverPrivateKey = fs.readFileSync(path.join(wireguardDir, 'server-private.key'), "utf-8")
     const wg0Conf = `
 [Interface]
 Address = 10.8.0.1/32
 PrivateKey = ${serverPrivateKey}
-PostUp = ufw route allow in on wg0 out on eth0
-PostUp = iptables -t nat -I POSTROUTING -o eth0 -j MASQUERADE
-PreDown = ufw route delete allow in on wg0 out on eth0
-PreDown = iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+PostUp = ufw route allow in on wg0 out on ${interfacename}
+PostUp = iptables -t nat -I POSTROUTING -o ${interfacename} -j MASQUERADE
+PreDown = ufw route delete allow in on wg0 out on ${interfacename}
+PreDown = iptables -t nat -D POSTROUTING -o ${interfacename} -j MASQUERADE
 ListenPort = 51820
 `;
     fs.writeFileSync(serverConfPath, wg0Conf);
@@ -60,6 +68,7 @@ async function clientConf() {
 
 
 function journalctl() {
+    var interfacename = getInterfaceNames()
     exec('sudo ufw allow 51820/udp', (error, stdout, stderr) => {
         if (error) {
             console.error(`Error: ${error.message}`);
@@ -96,7 +105,7 @@ function journalctl() {
         console.log(`WireGuard Service Logs:${stdout}`);
     });
 
-    exec("sudo iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -o eth0 -j MASQUERADE", (error, stdout, stderr) => {
+    exec(`sudo iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -o ${interfacename} -j MASQUERADE`, (error, stdout, stderr) => {
         if (error) {
             console.error(`Error: ${error.message}`);
             return;

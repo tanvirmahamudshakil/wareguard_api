@@ -1,5 +1,5 @@
 // const express = require("express");
-import os from "os";
+
 import express from 'express';
 import middle from "./middleware/auth.mjs";
 import {
@@ -8,11 +8,7 @@ import {
 } from "./Wireguard/wireguard.mjs"
 
 
-function getInterfaceNames() {
-    const networkInterfaces = os.networkInterfaces();
-    const allkey = Object.keys(networkInterfaces);
-    return allkey.length > 1 ? allkey[1] : allkey[0];
-}
+
 
 
 
