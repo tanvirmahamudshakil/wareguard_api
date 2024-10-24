@@ -1,5 +1,5 @@
 // const express = require("express");
-const os = require('os');
+import os from "os";
 import express from 'express';
 import middle from "./middleware/auth.mjs";
 import {
