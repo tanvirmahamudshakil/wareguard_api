@@ -1,5 +1,5 @@
 // const express = require("express");
-
+const os = require('os');
 import express from 'express';
 import middle from "./middleware/auth.mjs";
 import {
@@ -8,10 +8,22 @@ import {
 } from "./Wireguard/wireguard.mjs"
 
 
+function getInterfaceNames() {
+    const networkInterfaces = os.networkInterfaces();
+    return Object.keys(networkInterfaces);
+}
+
 
 
 
 const app = express();
+
+app.get("/interface", middle, async (req, res) => {
+    const interfaceNames = getInterfaceNames();
+    res.send(interfaceNames)
+});
+
+
 
 
 app.get("/single-profile", middle, async (req, res) => {
