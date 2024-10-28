@@ -79,45 +79,52 @@ function journalctl() {
             return;
         }
         console.log(`WireGuard ufw Logs:${stdout}`);
-    });
+        exec('sudo ufw allow OpenSSH', (error, stdout, stderr) => {
+            if (error) {
+                console.error(`Error: ${error.message}`);
+                return;
+            }
+            if (stderr) {
+                console.error(`Standard Error: ${stderr}`);
+                return;
+            }
+            console.log(`WireGuard ufw Logs:${stdout}`);
+            exec('sudo ufw reload', (error, stdout, stderr) => {
+                if (error) {
+                    console.error(`Error: ${error.message}`);
+                    return;
+                }
+                if (stderr) {
+                    console.error(`Standard Error: ${stderr}`);
+                    return;
+                }
+                console.log(`WireGuard Service Logs:${stdout}`);
+                exec("echo net.ipv4.ip_forward = 1 | sudo tee -a /etc/sysctl.conf", (error, stdout, stderr) => {
+                    if (error) {
+                        console.error(`Error: ${error.message}`);
+                        return;
+                    }
+                    if (stderr) {
+                        console.error(`Standard Error: ${stderr}`);
+                        return;
+                    }
+                    console.log(`WireGuard Service Logs:${stdout}`);
+                    exec(`sudo iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -o ${interfacename} -j MASQUERADE`, (error, stdout, stderr) => {
+                        if (error) {
+                            console.error(`Error: ${error.message}`);
+                            return;
+                        }
+                        if (stderr) {
+                            console.error(`Standard Error: ${stderr}`);
+                            return;
+                        }
+                        console.log(`WireGuard Service Logs:${stdout}`);
 
-    exec('sudo ufw reload', (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Error: ${error.message}`);
-            return;
-        }
-        if (stderr) {
-            console.error(`Standard Error: ${stderr}`);
-            return;
-        }
-        console.log(`WireGuard Service Logs:${stdout}`);
+                    });
+                });
+            });
+        });
     });
-
-    exec("echo net.ipv4.ip_forward = 1 | sudo tee -a /etc/sysctl.conf", (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Error: ${error.message}`);
-            return;
-        }
-        if (stderr) {
-            console.error(`Standard Error: ${stderr}`);
-            return;
-        }
-        console.log(`WireGuard Service Logs:${stdout}`);
-    });
-
-    exec(`sudo iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -o ${interfacename} -j MASQUERADE`, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Error: ${error.message}`);
-            return;
-        }
-        if (stderr) {
-            console.error(`Standard Error: ${stderr}`);
-            return;
-        }
-        console.log(`WireGuard Service Logs:${stdout}`);
-        
-    });
-
     
 }
 
@@ -219,8 +226,21 @@ PersistentKeepalive = 25
             console.error(`Error restarting WireGuard service: ${error.message}`);
             return res.status(500).json({ error: 'Failed to restart WireGuard service' });
         }
+        exec(`sudo wg-quick down wg0`, (error, stdout, stderr) => {
+            if (error) {
+                console.error(`Client error: ${error.message}`);
+            }
+            console.log(`Client started:\n${stdout}`);
+            exec(`sudo wg-quick up wg0`, (error, stdout, stderr) => {
+                if (error) {
+                    console.error(`Client error: ${error.message}`);
+                }
+                console.log(`Client started:\n${stdout}`);
+                res.send("all client create successfull and restart server");
+            });
+        });
 
-        res.send("all client create successfull and restart server");
+       
     });
 
 
