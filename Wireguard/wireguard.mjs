@@ -115,19 +115,20 @@ function journalctl() {
             return;
         }
         console.log(`WireGuard Service Logs:${stdout}`);
+        exec("sudo iptables-save | sudo tee /etc/iptables/rules.v4", (error, stdout, stderr) => {
+            if (error) {
+                console.error(`Error: ${error.message}`);
+                return;
+            }
+            if (stderr) {
+                console.error(`Standard Error: ${stderr}`);
+                return;
+            }
+            console.log(`WireGuard Service Logs:${stdout}`);
+        });
     });
 
-    exec("sudo iptables-save | sudo tee /etc/iptables/rules.v4", (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Error: ${error.message}`);
-            return;
-        }
-        if (stderr) {
-            console.error(`Standard Error: ${stderr}`);
-            return;
-        }
-        console.log(`WireGuard Service Logs:${stdout}`);
-    });
+    
 }
 
 
