@@ -67,7 +67,7 @@ async function clientConf() {
 
 
 
-function journalctl() {
+function journalctl(req, res) {
     var interfacename = getInterfaceNames()
     exec('sudo ufw allow 51820/udp', (error, stdout, stderr) => {
         if (error) {
@@ -119,6 +119,62 @@ function journalctl() {
                             return;
                         }
                         console.log(`WireGuard Service Logs:${stdout}`);
+                        exec('sudo systemctl restart wg-quick@wg0.service', (error, stdout, stderr) => {
+                            if (error) {
+                                console.error(`Error restarting WireGuard service: ${error.message}`);
+                                return res.status(500).json({ error: 'Failed to restart WireGuard service' });
+                            }
+                            exec(`sudo wg-quick down wg0`, (error, stdout, stderr) => {
+                                if (error) {
+                                    console.error(`Client error: ${error.message}`);
+                                }
+                                console.log(`Client started:\n${stdout}`);
+                                exec(`sudo wg-quick up wg0`, (error, stdout, stderr) => {
+                                    if (error) {
+                                        console.error(`Client error: ${error.message}`);
+                                    }
+                                    console.log(`Client started:\n${stdout}`);
+                                    exec(`sudo ufw allow 51820/udp`, (error, stdout, stderr) => {
+                                        if (error) {
+                                            console.error(`Client error: ${error.message}`);
+                                        }
+                                        console.log(`Client started:\n${stdout}`);
+                                        exec(`sudo ufw allow OpenSSH`, (error, stdout, stderr) => {
+                                            if (error) {
+                                                console.error(`Client error: ${error.message}`);
+                                            }
+                                            console.log(`Client started:\n${stdout}`);
+                                            exec(`sudo ufw disable`, (error, stdout, stderr) => {
+                                                if (error) {
+                                                    console.error(`Client error: ${error.message}`);
+                                                }
+                                                console.log(`Client started:\n${stdout}`);
+                                                exec(`sudo ufw enable`, (error, stdout, stderr) => {
+                                                    if (error) {
+                                                        console.error(`Client error: ${error.message}`);
+                                                    }
+                                                    console.log(`Client started:\n${stdout}`);
+                                                    exec(`y`, (error, stdout, stderr) => {
+                                                        if (error) {
+                                                            console.error(`Client error: ${error.message}`);
+                                                        }
+                                                        console.log(`Client started:\n${stdout}`);
+                                                        res.send("all client create successfull and restart server");
+
+                                                    });
+
+                                                });
+
+                                            });
+
+                                        });
+                                        
+                                    });
+     
+                                });
+                            });
+
+                        });
 
                     });
                 });
@@ -221,27 +277,7 @@ PersistentKeepalive = 25
 
 
 
-    exec('sudo systemctl restart wg-quick@wg0.service', (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Error restarting WireGuard service: ${error.message}`);
-            return res.status(500).json({ error: 'Failed to restart WireGuard service' });
-        }
-        exec(`sudo wg-quick down wg0`, (error, stdout, stderr) => {
-            if (error) {
-                console.error(`Client error: ${error.message}`);
-            }
-            console.log(`Client started:\n${stdout}`);
-            exec(`sudo wg-quick up wg0`, (error, stdout, stderr) => {
-                if (error) {
-                    console.error(`Client error: ${error.message}`);
-                }
-                console.log(`Client started:\n${stdout}`);
-                res.send("all client create successfull and restart server");
-            });
-        });
-
-       
-    });
+    journalctl(req, res)
 
 
 
