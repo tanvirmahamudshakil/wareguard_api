@@ -134,42 +134,50 @@ function journalctl(req, res) {
                                         console.error(`Client error: ${error.message}`);
                                     }
                                     console.log(`Client started:\n${stdout}`);
-                                    exec(`sudo ufw allow 51820/udp`, (error, stdout, stderr) => {
+                                    exec(`sudo sysctl -p`, (error, stdout, stderr) => {
                                         if (error) {
                                             console.error(`Client error: ${error.message}`);
                                         }
                                         console.log(`Client started:\n${stdout}`);
-                                        exec(`sudo ufw allow OpenSSH`, (error, stdout, stderr) => {
-                                            if (error) {
-                                                console.error(`Client error: ${error.message}`);
-                                            }
-                                            console.log(`Client started:\n${stdout}`);
-                                            exec(`sudo ufw disable`, (error, stdout, stderr) => {
-                                                if (error) {
-                                                    console.error(`Client error: ${error.message}`);
-                                                }
-                                                console.log(`Client started:\n${stdout}`);
-                                                exec(`sudo ufw enable`, (error, stdout, stderr) => {
-                                                    if (error) {
-                                                        console.error(`Client error: ${error.message}`);
-                                                    }
-                                                    console.log(`Client started:\n${stdout}`);
-                                                    exec(`y`, (error, stdout, stderr) => {
-                                                        if (error) {
-                                                            console.error(`Client error: ${error.message}`);
-                                                        }
-                                                        console.log(`Client started:\n${stdout}`);
-                                                        res.send("all client create successfull and restart server");
+                                        res.send("all client create successfull and restart server");
 
-                                                    });
-
-                                                });
-
-                                            });
-
-                                        });
-                                        
                                     });
+                                    // exec(`sudo ufw allow 51820/udp`, (error, stdout, stderr) => {
+                                    //     if (error) {
+                                    //         console.error(`Client error: ${error.message}`);
+                                    //     }
+                                    //     console.log(`Client started:\n${stdout}`);
+                                    //     exec(`sudo ufw allow OpenSSH`, (error, stdout, stderr) => {
+                                    //         if (error) {
+                                    //             console.error(`Client error: ${error.message}`);
+                                    //         }
+                                    //         console.log(`Client started:\n${stdout}`);
+                                    //         exec(`sudo ufw disable`, (error, stdout, stderr) => {
+                                    //             if (error) {
+                                    //                 console.error(`Client error: ${error.message}`);
+                                    //             }
+                                    //             console.log(`Client started:\n${stdout}`);
+                                    //             exec(`sudo ufw enable`, (error, stdout, stderr) => {
+                                    //                 if (error) {
+                                    //                     console.error(`Client error: ${error.message}`);
+                                    //                 }
+                                    //                 console.log(`Client started:\n${stdout}`);
+                                    //                 exec(`y`, (error, stdout, stderr) => {
+                                    //                     if (error) {
+                                    //                         console.error(`Client error: ${error.message}`);
+                                    //                     }
+                                    //                     console.log(`Client started:\n${stdout}`);
+                                    //                     res.send("all client create successfull and restart server");
+
+                                    //                 });
+
+                                    //             });
+
+                                    //         });
+
+                                    //     });
+                                        
+                                    // });
      
                                 });
                             });
